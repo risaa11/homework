@@ -29,18 +29,24 @@ int** transponMatrix(int** matrix, int size_X, int size_Y){
         matrix2[i] = new int[size_Y];
         
         for(int j = 0; j < size_Y; j++){
-            matrix2[i][j] = matrix[j][i];  
+            matrix2[i][j] = matrix[j][i];
         }
      }
+    for(int i = 0; i<size_X; ++i)
+    {
+        for(int j = 0; j<size_Y; ++j)
+            matrix[i][j] = matrix2[i][j];
+        
+    }
     return matrix2;
 }
 
-void printMatrix2(int** matrix2, int size_X, int size_Y){
+void printMatrix2(int** matrix, int size_X, int size_Y){
     for(int i = 0; i < size_X; i++){
         
         
         for(int j = 0; j < size_Y; j++){
-            cout << matrix2[i][j] << " ";  
+            cout << matrix[i][j] << " ";  
         }
         cout << endl;
      }
@@ -67,7 +73,7 @@ int main()
     int** matrix = getRandomMatrix(5,5);
     printMatrix(matrix, 5, 5);
     cout<<"================================"<<endl;
-    int** matrix2 = transponMatrix(matrix,  5,  5);
-    printMatrix2(matrix2,  5,  5);
+    transponMatrix(matrix,  5,  5);
+    printMatrix2(matrix,  5,  5);
     return 0;
 }
