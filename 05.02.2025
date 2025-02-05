@@ -1,0 +1,127 @@
+// ConsoleApplication5.cpp : Этот файл содержит функцию "main". Здесь начинается и заканчивается выполнение программы.
+//
+
+#include <iostream>
+
+
+class Distance
+{
+private:
+    int Kilometers;
+    int Meters;
+public:
+    int GetKilo()
+    {
+        return this->Kilometers;
+    }
+    int SetKilo(int Kilo)
+    {
+        this->Kilometers = Kilo;
+    }
+    int GetMeter()
+    {
+        return this->Meters;
+    }
+    int SetMeter(int Meter)
+    {
+        this->Meters = Meter;
+    }
+    Distance(int Kilo, int Meter)
+    {
+        this->Kilometers = Kilo;
+        this->Meters = Meter;
+    }
+    Distance()
+    {
+        this->Kilometers = 0;
+        this->Meters = 0;
+    }
+    Distance operator+(const Distance& Term)
+    {
+        Distance Temp = Distance(this->Kilometers + Term.Kilometers, this->Meters + Term.Meters);
+        while (Temp.Meters > 1000)
+        {
+            Temp.Kilometers += 1;
+            Temp.Meters -= 1000;
+        }
+        return Temp;
+    }
+    Distance operator-(const Distance& Term)
+    {
+        Distance Temp = Distance(this->Kilometers - Term.Kilometers, this->Meters - Term.Meters);
+        while (Temp.Meters > 1000)
+        {
+            Temp.Kilometers += 1;
+            Temp.Meters -= 1000;
+        }
+        return Temp;
+    }
+    Distance operator*(const Distance& Term)
+    {
+        Distance Temp = Distance(this->Kilometers * Term.Kilometers, this->Meters * Term.Meters);
+        while (Temp.Meters > 1000)
+        {
+            Temp.Kilometers += 1;
+            Temp.Meters -= 1000;
+        }
+        return Temp;
+    }
+    Distance operator/(const Distance& Term)
+    {
+        Distance Temp = Distance(this->Kilometers / Term.Kilometers, this->Meters / Term.Meters);
+        while (Temp.Meters > 1000)
+        {
+            Temp.Kilometers += 1;
+            Temp.Meters -= 1000;
+        }
+        return Temp;
+    }
+    bool operator==(const Distance& Term)
+    {
+        return (Term.Kilometers == this->Kilometers && Term.Meters == this->Meters) ? true : false;
+    }
+    
+    friend std::ostream& operator<<(std::ostream& stream, Distance target)
+    {
+        stream << "Distance: \nKilometers. " << target.GetKilo() << "\nMeters. " << target.Meters << std::endl;
+        return stream;
+    }
+    bool operator<(const Distance& Term)
+    {
+        return (Term.Kilometers < this->Kilometers && Term.Meters < this->Meters) ? true : false;
+    }
+    bool operator>(const Distance& Term)
+    {
+        return (Term.Kilometers > this->Kilometers && Term.Meters > this->Meters) ? true : false;
+    }
+
+    friend std::istream& operator>>(std::istream& impstream, Distance& Exemp)
+    {
+        std::cout << "Input kilometers: \n";
+        impstream >> Exemp.Kilometers;
+        std::cout << "Input meters: \n";
+        impstream >> Exemp.Meters;
+        return impstream;
+    }
+
+    bool operator != (const Distance& exemp)
+    {
+        return (exemp.Kilometers != this->Kilometers && exemp.Meters != this->Meters);
+    }
+
+};
+
+int main()
+{
+    Distance distanceToCountry{ 99,700 };
+    Distance distanceToVillage{ 399,700 };
+    std::cout << distanceToCountry + distanceToVillage << std::endl;
+    (distanceToCountry == distanceToVillage) ? std::cout << "Distances is equals!!!" << std::endl : std::cout << "Distances is unequals" << std::endl;
+    (distanceToCountry < distanceToVillage) ? std::cout << "Distance less distance!!!" << std::endl : std::cout << "Distance unless distance" << std::endl;
+    (distanceToCountry > distanceToVillage) ? std::cout << "Distance more distance!!!" << std::endl : std::cout << "Distance more distance" << std::endl;
+    Distance* Test1 = new Distance();
+    std::cin >> *Test1;
+    std::cout << *Test1 << std::endl;
+    (distanceToCountry != distanceToVillage) ? std::cout << "Distances is unequals!!!" << std::endl : std::cout << "Distances is equals" << std::endl;
+}
+
