@@ -78,3 +78,37 @@ public:
 		this->material = material;
 	}
 };
+
+class Sweater
+{
+private:
+	std::string color;
+	std::string size;
+public:
+	std::string GetColor()
+	{
+		return this->color;
+	}
+	std::string GetSize()
+	{
+		return this->size;
+	}
+	void SetSize(std::string size)
+	{
+		this->size = size;
+	}
+	void SetColor(std::string color)
+	{
+		this->color = color;
+	}
+	Sweater()
+	{
+		this->color = "Black";
+		this->size = "XL";
+	}
+	Sweater(std::string color, std::string size)
+	{
+		this->color = color;
+		this->size = size;
+	}
+};
