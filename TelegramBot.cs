@@ -57,6 +57,10 @@ namespace TelegammBotCore
             public bool stopGame = false;
             public bool idc = true;
             public CallbackQuery c = new CallbackQuery();
+            public List<int> CardList = new List<int>();
+            public List<int> SuitList = new List<int>();
+            public List<int> dealerCardList = new List<int>();
+            public List<int> dealerSuitList = new List<int>();
         }
          
          Message msgg = new Message();
@@ -107,8 +111,12 @@ namespace TelegammBotCore
                 if (SelectUser[EveryTimeUser].FirstDeallerCheck)
                 {
                     Random Card = new Random();
-                    SelectUser[EveryTimeUser].dealerArray[SelectUser[EveryTimeUser].dealerCount] = Card.Next(1, 11);
+                    int tempDeal = Card.Next(1, 14);
+                    SelectUser[EveryTimeUser].dealerArray[SelectUser[EveryTimeUser].dealerCount] = tempDeal;
                     SelectUser[EveryTimeUser].DeallerScore += SelectUser[EveryTimeUser].dealerArray[SelectUser[EveryTimeUser].dealerCount];
+                    SelectUser[EveryTimeUser].dealerCardList.Add(tempDeal); 
+                    tempDeal = Card.Next(1, 4);
+                    SelectUser[EveryTimeUser].dealerSuitList.Add(tempDeal);
                     SelectUser[EveryTimeUser].dealerCount++;
                 }
 
@@ -158,17 +166,17 @@ namespace TelegammBotCore
                            replyMarkup: new ReplyKeyboardRemove());
                     await bot.SendMessage(UsersEveryTime[EveryTimeUser].Chat, $"Dealer open next card");
                     Random Card = new Random();
-                    SelectUser[EveryTimeUser].dealerArray[SelectUser[EveryTimeUser].dealerCount] = Card.Next(1, 11);
+                    int tempDeal = Card.Next(1, 14);
+                    SelectUser[EveryTimeUser].dealerArray[SelectUser[EveryTimeUser].dealerCount] = tempDeal;
                     SelectUser[EveryTimeUser].DeallerScore += SelectUser[EveryTimeUser].dealerArray[SelectUser[EveryTimeUser].dealerCount];
+                    SelectUser[EveryTimeUser].dealerCardList.Add(tempDeal);
+                    tempDeal = Card.Next(1, 4);
+                    SelectUser[EveryTimeUser].dealerSuitList.Add(tempDeal);
                     SelectUser[EveryTimeUser].dealerCount++;
-                    Thread.Sleep(1000);
-                    string DealerCardstr = "Dealer have a ";
-                    for (int i = 0; i < SelectUser[EveryTimeUser].dealerCount; ++i)
-                    {
-                        DealerCardstr += $"|{SelectUser[EveryTimeUser].dealerArray[i]}|";
-                    }
+
+                    string DealerCardstr = DefaultDeal();
                     var inlineMarkup3 = new InlineKeyboardMarkup()
-                    .AddNewRow($"General dealer score = {SelectUser[EveryTimeUser].DeallerScore}")
+                    .AddNewRow($"Dealer score = {SelectUser[EveryTimeUser].DeallerScore}")
                     .AddNewRow($"Your score = {SelectUser[EveryTimeUser].checkCard}")
                     .AddNewRow($"{DealerCardstr}");
 
@@ -190,7 +198,7 @@ namespace TelegammBotCore
                         }    
                         else
                         {
-                            await bot.SendMessage(UsersEveryTime[EveryTimeUser].Chat, "YOU SO NOOB)0)!!!!!, DEALLER WIN!!! ");
+                            await bot.SendMessage(UsersEveryTime[EveryTimeUser].Chat, "YOU ARE SO NOOB)0)!!!!!, DEALLER WIN!!! ");
                             SelectUser[EveryTimeUser].stopGame = true;
                         }
                     }
@@ -198,29 +206,28 @@ namespace TelegammBotCore
                 } while (SelectUser[EveryTimeUser].DeallerScore <= 21 && !SelectUser[EveryTimeUser].DeallerStay);
 
             }
-            if (UsersEveryTime[EveryTimeUser].Text == "взять карту" || SelectUser[EveryTimeUser].c.Data == "Взять карту")
+            if (UsersEveryTime[EveryTimeUser].Text == "Взять карту" || SelectUser[EveryTimeUser].c.Data == "Взять карту")
             {
                 
                 await bot.SendMessage(UsersEveryTime[EveryTimeUser].Chat, $"Идет раздача карт");
-                Thread.Sleep(2000);
-                Random Card = new Random();
-                SelectUser[EveryTimeUser].array[SelectUser[EveryTimeUser].countt] = Card.Next(1, 11);
+
+                string setCard = razdacha();
+
                 SelectUser[EveryTimeUser].checkCard += SelectUser[EveryTimeUser].array[SelectUser[EveryTimeUser].countt];
-                string MyCard = "";
-                for (int i = 0; i <= SelectUser[EveryTimeUser].countt; ++i)
-                {
-                    MyCard += $"|{SelectUser[EveryTimeUser].array[i]}|";
-                }
+                
                 string Poluchenie = $"<b><u>Bot menu</u></b>: ";
 
+                string myCard = FullCard();
+
+
                 var inlineMarkup2 = new InlineKeyboardMarkup()
-                .AddNewRow($"Вы получили карту {SelectUser[EveryTimeUser].array[SelectUser[EveryTimeUser].countt]}")
-                .AddNewRow($"Ваши карты: {MyCard}")
-                .AddNewRow($"Общее количество ваших карт: {SelectUser[EveryTimeUser].countt + 1}")
-                .AddNewRow($"Ваш общий счет: {SelectUser[EveryTimeUser].checkCard}")
-                .AddButton("Взять карту", "Взять карту")
-                .AddButton("Оставить текущие карты", "Оставить текущие карты")
-                .AddButton("Прекратить игру", "stop");
+                .AddNewRow(setCard)
+                .AddNewRow($"{myCard}")
+                .AddNewRow($"Кол-во карт:   {SelectUser[EveryTimeUser].countt + 1}")
+                .AddNewRow($"Счет:   {SelectUser[EveryTimeUser].checkCard}")
+                .AddButton("Взять карту   ", "Взять карту")
+                .AddButton("Пас   ", "Оставить текущие карты")
+                .AddButton("Выйти   ", "stop");
 
                 for (int i = 0; i<= SelectUser[EveryTimeUser].countt; ++i)
                 {
@@ -229,16 +236,13 @@ namespace TelegammBotCore
                 await bot.SendMessage(UsersEveryTime[EveryTimeUser].Chat, "<b><u>Black menu</u></b>:", parseMode: ParseMode.Html, linkPreviewOptions: true,
                         replyMarkup: new ReplyKeyboardRemove());
                 await bot.SendMessage(UsersEveryTime[EveryTimeUser].Chat, "Справка: ", parseMode: ParseMode.Html, replyMarkup: inlineMarkup2);
-                string DealerCardstr = "Dealer have a ";
-                for(int i = 0; i< SelectUser[EveryTimeUser].dealerCount; ++i)
-                {
-                    DealerCardstr += $"|{SelectUser[EveryTimeUser].dealerArray[i]}|";
-                }
+                
                 await bot.SendMessage(UsersEveryTime[EveryTimeUser].Chat, "<b><u>Black Dealer menu</u></b>:", parseMode: ParseMode.Html, linkPreviewOptions: true,
                         replyMarkup: new ReplyKeyboardRemove());
+                string dealerCard = DefaultDeal();
                 var inlineMarkup3 = new InlineKeyboardMarkup()
-                .AddNewRow($"General dealer score = {SelectUser[EveryTimeUser].DeallerScore}")
-                .AddNewRow($"{DealerCardstr}");
+                .AddNewRow($"Dealer score = {SelectUser[EveryTimeUser].DeallerScore}")
+                .AddNewRow($"{dealerCard}");
 
                 await bot.SendMessage(UsersEveryTime[EveryTimeUser].Chat, "DealerScore: ", parseMode: ParseMode.Html, replyMarkup: inlineMarkup3);
                 ++SelectUser[EveryTimeUser].countt;
@@ -262,7 +266,9 @@ namespace TelegammBotCore
                 SelectUser[EveryTimeUser].DeallerScore = 0;
                 SelectUser[EveryTimeUser].DeallerStay = false;
                 SelectUser[EveryTimeUser].score = 0;
-                    for(int i = 0; i<12; ++i)
+                SelectUser[EveryTimeUser].CardList.Clear();
+                SelectUser[EveryTimeUser].SuitList.Clear();
+                for (int i = 0; i<12; ++i)
                     {
                     SelectUser[EveryTimeUser].array[i] = 0;
                     SelectUser[EveryTimeUser].dealerArray[i] = 0;
@@ -271,7 +277,121 @@ namespace TelegammBotCore
 
             }
         }
-        
+
+
+        string razdacha()
+        {
+            Thread.Sleep(1000);
+            Random Card = new Random();
+            bool cardCheck = false;
+            int tempSuit = 0;
+            int tempCard = 0;
+            string setCard = "Новая карта ";
+            do
+            {
+                cardCheck = false;
+                tempCard = Card.Next(1, 14);
+                SelectUser[EveryTimeUser].array[SelectUser[EveryTimeUser].countt] = tempCard;
+                tempSuit = Card.Next(1, 4);
+                for (int i = 0; i < SelectUser[EveryTimeUser].SuitList.Count; ++i)
+                {
+                    if (SelectUser[EveryTimeUser].array[SelectUser[EveryTimeUser].countt] == SelectUser[EveryTimeUser].CardList[i] && tempSuit == SelectUser[EveryTimeUser].SuitList[i])
+                    {
+                        cardCheck = true;
+                        break;
+                    }
+                }
+            } while (cardCheck);
+
+            if (SelectUser[EveryTimeUser].checkCard == 1 && SelectUser[EveryTimeUser].checkCard + 11 <= 21)
+                SelectUser[EveryTimeUser].array[SelectUser[EveryTimeUser].countt] += 11;
+            SelectUser[EveryTimeUser].CardList.Add(SelectUser[EveryTimeUser].array[SelectUser[EveryTimeUser].countt]);
+            SelectUser[EveryTimeUser].SuitList.Add(tempSuit);
+            switch (SelectUser[EveryTimeUser].array[SelectUser[EveryTimeUser].countt])
+            {
+                case 11:
+                    setCard += "| V";
+                    SelectUser[EveryTimeUser].array[SelectUser[EveryTimeUser].countt] = 10;
+                    break;
+                case 12:
+                    setCard += "| D";
+                    SelectUser[EveryTimeUser].array[SelectUser[EveryTimeUser].countt] = 10;
+                    break;
+                case 13:
+                    setCard += "| K";
+                    SelectUser[EveryTimeUser].array[SelectUser[EveryTimeUser].countt] = 10;
+                    break;
+                case 1:
+                    setCard += "| A";
+                    break;
+                default:
+                    setCard += $"| {SelectUser[EveryTimeUser].array[SelectUser[EveryTimeUser].countt]}";
+                    break;
+            }
+            switch (tempSuit)
+            {
+                case 1:
+                    setCard += "♦️ |";
+                    break;
+                case 2:
+                    setCard += "♥️ |";
+                    break;
+                case 3:
+                    setCard += "♠️ |";
+                    break;
+                case 4:
+                    setCard += "♣️ |";
+                    break;
+            }
+            return setCard;
+        }
+
+        string FullCard()
+        {
+            
+                string setCard = "Карты: ";
+
+                for (int i = 0; i < SelectUser[EveryTimeUser].CardList.Count; ++i)
+                {
+                    switch (SelectUser[EveryTimeUser].CardList[i])
+                    {
+                        case 11:
+                            setCard += "| V";
+                            break;
+                        case 12:
+                            setCard += "| D";
+                            break;
+                        case 13:
+                            setCard += "| K";
+                            break;
+                        case 1:
+                            setCard += "| A";
+                            break;
+                        default:
+                            setCard += $"| {SelectUser[EveryTimeUser].CardList[i]}";
+                            break;
+                    }
+                    switch (SelectUser[EveryTimeUser].SuitList[i])
+                    {
+                        case 1:
+                            setCard += "♦️ | ";
+                            break;
+                        case 2:
+                            setCard += "♥️ | ";
+                            break;
+                        case 3:
+                            setCard += "♠️ | ";
+                            break;
+                        case 4:
+                            setCard += "♣️ | ";
+                            break;
+                    }
+
+                }
+
+                return setCard;
+            
+        }
         async Task OnError(Exception exception, HandleErrorSource source)
         {
             Console.WriteLine(exception);
@@ -347,6 +467,62 @@ namespace TelegammBotCore
                     break;
             }
         }
+
+        string DefaultDeal()
+        {
+            string defaultt = $"Карты диллера: ";
+            for (int i = 0; i < SelectUser[EveryTimeUser].dealerSuitList.Count; i++)
+            {
+                switch (SelectUser[EveryTimeUser].dealerArray[i])
+                {
+                    case 11:
+                        defaultt += "| V";
+                        SelectUser[EveryTimeUser].dealerCardList[i] = 10;
+                        SelectUser[EveryTimeUser].dealerArray[SelectUser[EveryTimeUser].dealerCount] = 10;
+                        SelectUser[EveryTimeUser].dealerArray[i] = 10;
+                        SelectUser[EveryTimeUser].DeallerScore -= 1;
+                        break;
+                    case 12:
+                        defaultt += "| D";
+                        SelectUser[EveryTimeUser].dealerCardList[i] = 10;
+                        SelectUser[EveryTimeUser].dealerArray[SelectUser[EveryTimeUser].dealerCount] = 10;
+                        SelectUser[EveryTimeUser].dealerArray[i] = 10;
+                        SelectUser[EveryTimeUser].DeallerScore -= 2;
+                        break;
+                    case 13:
+                        defaultt += "| K";
+                        SelectUser[EveryTimeUser].dealerCardList[i] = 10;
+                        SelectUser[EveryTimeUser].dealerArray[SelectUser[EveryTimeUser].dealerCount] = 10;
+                        SelectUser[EveryTimeUser].dealerArray[i] = 10;
+                        SelectUser[EveryTimeUser].DeallerScore -= 3;
+                        break;
+                    case 1:
+                        defaultt += "| A";
+                        if (SelectUser[EveryTimeUser].DeallerScore + 11 <= 21)
+                            SelectUser[EveryTimeUser].DeallerScore += 11;
+                        break;
+                    default:
+                        defaultt += $"| {SelectUser[EveryTimeUser].dealerArray[i]}";
+                        break;
+                }
+                switch (SelectUser[EveryTimeUser].dealerSuitList[i])
+                {
+                    case 1:
+                        defaultt += "♦️ |";
+                        break;
+                    case 2:
+                        defaultt += "♥️ |";
+                        break;
+                    case 3:
+                        defaultt += "♠️ |";
+                        break;
+                    case 4:
+                        defaultt += "♣️ |";
+                        break;
+                }
+            }
+            return defaultt;
+        }
         async Task OnTextMessage(Message msg) // received a text message that is not a command
         {
             
@@ -395,8 +571,12 @@ namespace TelegammBotCore
                     if (SelectUser[EveryTimeUser].FirstDeallerCheck)
                     {
                         Random Card = new Random();
-                        SelectUser[EveryTimeUser].dealerArray[SelectUser[EveryTimeUser].dealerCount] = Card.Next(1, 11);
+                        int tempDeal = Card.Next(1, 14);
+                        SelectUser[EveryTimeUser].dealerArray[SelectUser[EveryTimeUser].dealerCount] = tempDeal;
                         SelectUser[EveryTimeUser].DeallerScore += SelectUser[EveryTimeUser].dealerArray[SelectUser[EveryTimeUser].dealerCount];
+                        SelectUser[EveryTimeUser].dealerCardList.Add(tempDeal);
+                        tempDeal = Card.Next(1, 4);
+                        SelectUser[EveryTimeUser].dealerSuitList.Add(tempDeal);
                         SelectUser[EveryTimeUser].dealerCount++;
                     }
 
