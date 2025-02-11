@@ -16,28 +16,28 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace TelegammBotCore
 {
-    
+
     internal class BotCore
     {
         User me;
         TelegramBotClient bot;
-      
+
         public BotCore(TelegramBotClient b)
         {
             bot = b;
             me = bot.GetMe().Result;
-           // bot.DeleteWebhook();          // you may comment this line if you find it unnecessary
+            // bot.DeleteWebhook();          // you may comment this line if you find it unnecessary
             bot.DropPendingUpdates();
 
             bot.OnError += OnError;
             bot.OnMessage += OnMessage;
             bot.OnUpdate += OnUpdate;
-            
+
         }
         public void Start(CancellationTokenSource cts)
         {
             Console.WriteLine($"@{me.Username} is running... Press Escape to terminate");
-            while (Console.ReadKey(true).Key != ConsoleKey.Escape) ; 
+            while (Console.ReadKey(true).Key != ConsoleKey.Escape) ;
             cts.Cancel(); // stop the bot            
         }
 
@@ -62,24 +62,24 @@ namespace TelegammBotCore
             public List<int> dealerCardList = new List<int>();
             public List<int> dealerSuitList = new List<int>();
         }
-         
-         Message msgg = new Message();
+
+        Message msgg = new Message();
         List<Userrrr> SelectUser = new List<Userrrr>();
         List<Message> UsersEveryTime = new List<Message>();
 
         int UsersCount = 0;
         int EveryTimeUser = -1;
         bool CreateUser = true;
-        
+
         async Task OnMessage(Message msg, UpdateType type)
         {
-            
+
             //await bot.SendMessage(msg.Chat, $"Проверка на присутствие на сервере.");
-            for (int i = 0; i<UsersEveryTime.Count; ++i)
+            for (int i = 0; i < UsersEveryTime.Count; ++i)
             {
                 if (msg.Chat.Id == UsersEveryTime[i].Chat.Id)
                 {
-                   // await bot.SendMessage(msg.Chat, $"Ты уже есть на сервере.");
+                    // await bot.SendMessage(msg.Chat, $"Ты уже есть на сервере.");
                     EveryTimeUser = i;
                     CreateUser = false;
                     UsersEveryTime[EveryTimeUser] = msg;
@@ -88,7 +88,7 @@ namespace TelegammBotCore
                 else
                     CreateUser = true;
             }
-            if(CreateUser)
+            if (CreateUser)
             {
                 await bot.SendMessage(msg.Chat, $"Регистрация на сервере. Твой Username - {msg.Chat.Username}");
                 Userrrr r = new Userrrr();
@@ -114,7 +114,7 @@ namespace TelegammBotCore
                     int tempDeal = Card.Next(1, 14);
                     SelectUser[EveryTimeUser].dealerArray[SelectUser[EveryTimeUser].dealerCount] = tempDeal;
                     SelectUser[EveryTimeUser].DeallerScore += SelectUser[EveryTimeUser].dealerArray[SelectUser[EveryTimeUser].dealerCount];
-                    SelectUser[EveryTimeUser].dealerCardList.Add(tempDeal); 
+                    SelectUser[EveryTimeUser].dealerCardList.Add(tempDeal);
                     tempDeal = Card.Next(1, 4);
                     SelectUser[EveryTimeUser].dealerSuitList.Add(tempDeal);
                     SelectUser[EveryTimeUser].dealerCount++;
@@ -146,7 +146,7 @@ namespace TelegammBotCore
         async void UserList()
         {
             string userList = "Люди на сервере: ";
-            for(int i = 0; i<UsersEveryTime.Count; ++i)
+            for (int i = 0; i < UsersEveryTime.Count; ++i)
             {
                 userList += $" {UsersEveryTime[i].Chat.Username},";
             }
@@ -158,7 +158,7 @@ namespace TelegammBotCore
                 SelectUser[EveryTimeUser].DeallerMode = true;
             if (SelectUser[EveryTimeUser].c.Data == "stop")
                 SelectUser[EveryTimeUser].stopGame = true;
-            if(SelectUser[EveryTimeUser].DeallerMode)
+            if (SelectUser[EveryTimeUser].DeallerMode)
             {
                 do
                 {
@@ -188,14 +188,14 @@ namespace TelegammBotCore
                         await bot.SendMessage(UsersEveryTime[EveryTimeUser].Chat, "YOU WIN!!!!! ", parseMode: ParseMode.Html, replyMarkup: inlineMarkup3);
                         SelectUser[EveryTimeUser].stopGame = true;
                     }
-                    else if(SelectUser[EveryTimeUser].DeallerScore > 16)
+                    else if (SelectUser[EveryTimeUser].DeallerScore > 16)
                     {
                         SelectUser[EveryTimeUser].DeallerStay = true;
-                        if(SelectUser[EveryTimeUser].checkCard > SelectUser[EveryTimeUser].DeallerScore)
+                        if (SelectUser[EveryTimeUser].checkCard > SelectUser[EveryTimeUser].DeallerScore)
                         {
                             await bot.SendMessage(UsersEveryTime[EveryTimeUser].Chat, "YOU WIN!!!!! ");
                             SelectUser[EveryTimeUser].stopGame = true;
-                        }    
+                        }
                         else
                         {
                             await bot.SendMessage(UsersEveryTime[EveryTimeUser].Chat, "YOU ARE SO NOOB)0)!!!!!, DEALLER WIN!!! ");
@@ -208,13 +208,13 @@ namespace TelegammBotCore
             }
             if (UsersEveryTime[EveryTimeUser].Text == "Взять карту" || SelectUser[EveryTimeUser].c.Data == "Взять карту")
             {
-                
+
                 await bot.SendMessage(UsersEveryTime[EveryTimeUser].Chat, $"Идет раздача карт");
 
                 string setCard = razdacha();
 
                 SelectUser[EveryTimeUser].checkCard += SelectUser[EveryTimeUser].array[SelectUser[EveryTimeUser].countt];
-                
+
                 string Poluchenie = $"<b><u>Bot menu</u></b>: ";
 
                 string myCard = FullCard();
@@ -229,14 +229,14 @@ namespace TelegammBotCore
                 .AddButton("Пас   ", "Оставить текущие карты")
                 .AddButton("Выйти   ", "stop");
 
-                for (int i = 0; i<= SelectUser[EveryTimeUser].countt; ++i)
+                for (int i = 0; i <= SelectUser[EveryTimeUser].countt; ++i)
                 {
                     Poluchenie += $"|{SelectUser[EveryTimeUser].array[i]}|";
                 }
                 await bot.SendMessage(UsersEveryTime[EveryTimeUser].Chat, "<b><u>Black menu</u></b>:", parseMode: ParseMode.Html, linkPreviewOptions: true,
                         replyMarkup: new ReplyKeyboardRemove());
                 await bot.SendMessage(UsersEveryTime[EveryTimeUser].Chat, "Справка: ", parseMode: ParseMode.Html, replyMarkup: inlineMarkup2);
-                
+
                 await bot.SendMessage(UsersEveryTime[EveryTimeUser].Chat, "<b><u>Black Dealer menu</u></b>:", parseMode: ParseMode.Html, linkPreviewOptions: true,
                         replyMarkup: new ReplyKeyboardRemove());
                 string dealerCard = DefaultDeal();
@@ -247,15 +247,15 @@ namespace TelegammBotCore
                 await bot.SendMessage(UsersEveryTime[EveryTimeUser].Chat, "DealerScore: ", parseMode: ParseMode.Html, replyMarkup: inlineMarkup3);
                 ++SelectUser[EveryTimeUser].countt;
 
-                }
-                if(SelectUser[EveryTimeUser].checkCard >21 || SelectUser[EveryTimeUser].stopGame)
-                {
-                    
-                    var inlineMarkup4 = new InlineKeyboardMarkup()
-                            .AddButton("Начать новую игру", "/black");
-                    await bot.SendMessage(UsersEveryTime[EveryTimeUser].Chat, "<b><u>Black menu</u></b>:", parseMode: ParseMode.Html, linkPreviewOptions: true,
-                               replyMarkup: new ReplyKeyboardRemove());
-                    await bot.SendMessage(UsersEveryTime[EveryTimeUser].Chat, $"Game over. you lose. try again?", replyMarkup: inlineMarkup4);
+            }
+            if (SelectUser[EveryTimeUser].checkCard > 21 || SelectUser[EveryTimeUser].stopGame)
+            {
+
+                var inlineMarkup4 = new InlineKeyboardMarkup()
+                        .AddButton("Начать новую игру", "/black");
+                await bot.SendMessage(UsersEveryTime[EveryTimeUser].Chat, "<b><u>Black menu</u></b>:", parseMode: ParseMode.Html, linkPreviewOptions: true,
+                           replyMarkup: new ReplyKeyboardRemove());
+                await bot.SendMessage(UsersEveryTime[EveryTimeUser].Chat, $"Game over. you lose. try again?", replyMarkup: inlineMarkup4);
 
                 SelectUser[EveryTimeUser].GameCheck = false;
                 SelectUser[EveryTimeUser].countt = 0;
@@ -268,11 +268,13 @@ namespace TelegammBotCore
                 SelectUser[EveryTimeUser].score = 0;
                 SelectUser[EveryTimeUser].CardList.Clear();
                 SelectUser[EveryTimeUser].SuitList.Clear();
-                for (int i = 0; i<12; ++i)
-                    {
+                SelectUser[EveryTimeUser].dealerCardList.Clear();
+                SelectUser[EveryTimeUser].dealerSuitList.Clear();
+                for (int i = 0; i < 12; ++i)
+                {
                     SelectUser[EveryTimeUser].array[i] = 0;
                     SelectUser[EveryTimeUser].dealerArray[i] = 0;
-                    }
+                }
                 SelectUser[EveryTimeUser].stopGame = false;
 
             }
@@ -348,49 +350,49 @@ namespace TelegammBotCore
 
         string FullCard()
         {
-            
-                string setCard = "Карты: ";
 
-                for (int i = 0; i < SelectUser[EveryTimeUser].CardList.Count; ++i)
+            string setCard = "Карты: ";
+
+            for (int i = 0; i < SelectUser[EveryTimeUser].CardList.Count; ++i)
+            {
+                switch (SelectUser[EveryTimeUser].CardList[i])
                 {
-                    switch (SelectUser[EveryTimeUser].CardList[i])
-                    {
-                        case 11:
-                            setCard += "| V";
-                            break;
-                        case 12:
-                            setCard += "| D";
-                            break;
-                        case 13:
-                            setCard += "| K";
-                            break;
-                        case 1:
-                            setCard += "| A";
-                            break;
-                        default:
-                            setCard += $"| {SelectUser[EveryTimeUser].CardList[i]}";
-                            break;
-                    }
-                    switch (SelectUser[EveryTimeUser].SuitList[i])
-                    {
-                        case 1:
-                            setCard += "♦️ | ";
-                            break;
-                        case 2:
-                            setCard += "♥️ | ";
-                            break;
-                        case 3:
-                            setCard += "♠️ | ";
-                            break;
-                        case 4:
-                            setCard += "♣️ | ";
-                            break;
-                    }
-
+                    case 11:
+                        setCard += "| V";
+                        break;
+                    case 12:
+                        setCard += "| D";
+                        break;
+                    case 13:
+                        setCard += "| K";
+                        break;
+                    case 1:
+                        setCard += "| A";
+                        break;
+                    default:
+                        setCard += $"| {SelectUser[EveryTimeUser].CardList[i]}";
+                        break;
+                }
+                switch (SelectUser[EveryTimeUser].SuitList[i])
+                {
+                    case 1:
+                        setCard += "♦️ | ";
+                        break;
+                    case 2:
+                        setCard += "♥️ | ";
+                        break;
+                    case 3:
+                        setCard += "♠️ | ";
+                        break;
+                    case 4:
+                        setCard += "♣️ | ";
+                        break;
                 }
 
-                return setCard;
-            
+            }
+
+            return setCard;
+
         }
         async Task OnError(Exception exception, HandleErrorSource source)
         {
@@ -398,7 +400,7 @@ namespace TelegammBotCore
         }
         async Task OnUpdate(Update update)
         {
-            
+
             switch (update)
             {
                 case { CallbackQuery: { } callbackQuery }: await OnCallbackQuery(callbackQuery); break;
@@ -406,7 +408,7 @@ namespace TelegammBotCore
                 default: Console.WriteLine($"Received unhandled update {update.Type}"); break;
             };
         }
-        
+
         async Task OnCommand(string command, string args, Message msg)
         {
             Console.WriteLine($"Received command: {command} {args}");
@@ -525,7 +527,7 @@ namespace TelegammBotCore
         }
         async Task OnTextMessage(Message msg) // received a text message that is not a command
         {
-            
+
         }
         async Task OnCallbackQuery(CallbackQuery callbackQuery)
         {
@@ -592,6 +594,6 @@ namespace TelegammBotCore
             if (pollAnswer.User != null)
                 await bot.SendMessage(pollAnswer.User.Id, $"You voted for option(s) id [{string.Join(',', pollAnswer.OptionIds)}]");
         }
-        
+
     }
 }
