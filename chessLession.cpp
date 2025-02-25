@@ -133,64 +133,137 @@ public:
 		this->R = false;
 		this->E = false;
 	}
-	char getColor()
+	
+	const char* getValue()
 	{
-		return (this->whiteColor == true) ? true : false;
+		if (this->whiteColor)
+		{
+			if (E)
+				return u8"♗";
+			else if (Q)
+				return u8"♕";
+			else if (H)
+				return u8"♘";
+			else if (R)
+				return u8"♖";
+			else if (P)
+				return u8"♟";
+			else if (K)
+				return u8"♔";
+			else if (!E && !Q && !H && !R && !P && !K)
+				return 0;
+		}
+		else
+		{
+			if (E)
+				return u8"♝";
+			else if (Q)
+				return u8"♛";
+			else if (H)
+				return u8"♞";
+			else if (R)
+				return u8"♜";
+			else if (P)
+				return u8"♙";
+			else if (K)
+				return u8"♚";
+			else if (!E && !Q && !H && !R && !P && !K)
+				return 0;
+		}
+
 	}
-	char getValue()
+	
+	void setValue(char s, char c)
 	{
-		if (E)
-			return 'E';
-		else if (Q)
-			return 'Q';
-		else if (H)
-			return 'H';
-		else if (R)
-			return 'R';
-		else if (P)
-			return 'P';
-		else if (K)
-			return 'K';
-		else if (!E && !Q && !H && !R && !P && !K)
-			return 0;
+		if (c == 'W' || c == 'w')
+		{
+			this->K = false;
+			this->Q = false;
+			this->H = false;
+			this->P = false;
+			this->R = false;
+			this->E = false;
+			if (s == 'k')
+			{
+				this->K = true;
+				this->whiteColor = true;
+			}
+			if (s == 'q')
+			{
+				this->Q = true;
+				this->whiteColor = true;
+			}
+			if (s == 'h')
+			{
+				this->H = true;
+				this->line = false;
+				this->zigzag = true;
+				this->whiteColor = true;
+			}
+			if (s == 'p')
+			{
+				this->P = true;
+				this->straight = true;
+				this->whiteColor = true;
+			}
+			if (s == 'r')
+			{
+				this->R = true;
+				this->straight = true;
+				this->whiteColor = true;
+			}
+			if (s == 'e')
+			{
+				this->E = true;
+				this->whiteColor = true;
+			}
+		}
+		else
+		{
+				this->K = false;
+				this->Q = false;
+				this->H = false;
+				this->P = false;
+				this->R = false;
+				this->E = false;
+				if (s == 'k')
+				{
+					this->K = true;
+					this->whiteColor = false;
+				}
+				if (s == 'q')
+				{
+					this->Q = true;
+					this->whiteColor = false;
+				}
+				if (s == 'h')
+				{
+					this->H = true;
+					this->line = false;
+					this->zigzag = true;
+					this->whiteColor = false;
+				}
+				if (s == 'p')
+				{
+					this->P = true;
+					this->straight = true;
+					this->whiteColor = false;
+				}
+				if (s == 'r')
+				{
+					this->R = true;
+					this->straight = true;
+					this->whiteColor = false;
+				}
+				if (s == 'e')
+				{
+					this->E = true;
+					this->whiteColor = false;
+				}
+		}
 	}
-	void setValue(char s)
-	{
-		this->K = false;
-		this->Q = false;
-		this->H = false;
-		this->P = false;
-		this->R = false;
-		this->E = false;
-		if (s == 'k')
-		{
-			this->K = true;
-		}
-		if (s == 'q')
-		{
-			this->Q = true;
-		}
-		if (s == 'h')
-		{
-			this->H = true;
-			this->line = false;
-			this->zigzag = true;
-		}
-		if (s == 'p')
-		{
-			this->P = true;
-			this->straight = true;
-		}
-		if (s == 'r')
-		{
-			this->R = true;
-			this->straight = true;
-		}
-		if (s == 'e')
-		{
-			this->E = true;
-		}
-	}
+
+
 	int getNull()
 	{
 		return (this->K == false && this->Q == false && this->H == false && this->P == false && this->R == false && this->E == false) ? 0 : 1;
@@ -198,6 +271,10 @@ public:
 	bool getZigZag()
 	{
 		return this->zigzag;
+	}
+	 char getColor()
+	{
+		 return (whiteColor) ? 'W' : 'B';
 	}
 };
 
@@ -233,43 +310,50 @@ void printMap(Figure** map, int size)
 
 void firstFillingMap(Figure** array, int size)
 {
+	const char* emoji = u8"♟";
 	for (int i = 0; i < size; ++i)
 	{
-		array[1][i].setValue('p');
-		array[6][i].setValue('p');
+		array[1][i].setValue('p', 'B');
+		array[6][i].setValue('p', 'W');
 	}
-	array[0][0].setValue('r');
-	array[0][7].setValue('r');
-	array[7][0].setValue('r');
-	array[7][7].setValue('r');
-	array[0][1].setValue('h');
-	array[0][6].setValue('h');
-	array[7][1].setValue('h');
-	array[7][6].setValue('h');
-	array[0][2].setValue('e');
-	array[0][5].setValue('e');
-	array[7][2].setValue('e');
-	array[7][5].setValue('e');
-	array[0][3].setValue('k');
-	array[7][3].setValue('k');
-	array[0][4].setValue('q');
-	array[7][4].setValue('q');
+	array[0][0].setValue('r', 'B');
+	array[0][7].setValue('r', 'B');
+	array[7][0].setValue('r', 'W');
+	array[7][7].setValue('r', 'W');
+	array[0][1].setValue('h', 'B');
+	array[0][6].setValue('h', 'B');
+	array[7][1].setValue('h', 'W');
+	array[7][6].setValue('h', 'W');
+	array[0][2].setValue('e', 'B');
+	array[0][5].setValue('e', 'B');
+	array[7][2].setValue('e', 'W');
+	array[7][5].setValue('e', 'W');
+	array[0][3].setValue('k', 'B');
+	array[7][3].setValue('k', 'W');
+	array[0][4].setValue('q', 'B');
+	array[7][4].setValue('q', 'W');
 }
 
 void newStep(Figure** array, int size);
 
 int main()
 {
+	SetConsoleOutputCP(CP_UTF8);
+	SetConsoleCP(CP_UTF8);
 	const int size = 8;
 	Figure** map = mapCreate(size);
 	firstFillingMap(map, size);
 	do
 	{
-		
-		printMap(map, size);
-		newStep(map, size);
-		
-		system("cls");
+		if (map[0][3].getValue() == u8"♚" && map[7][3].getValue() == u8"♔")
+		{
+			printMap(map, size);
+			newStep(map, size);
+
+			system("cls");
+		}
+		else
+			(map[0][3].getValue() == u8"♚") ? std::cout << "Game over, black wins" : std::cout << "Game over, white wins"; break;
 	} while (true);
 }
 
@@ -317,14 +401,16 @@ void newStep(Figure** map, int size)
 	else if (finn == 'H' || finn == 'h')
 		tempFinalPoint = 8;
 	std::cin >> tempFinalPoint2; 
-	if (map[size - (tempFigure2)][tempFigure - 1].getNull() && !map[size - (tempFinalPoint2)][tempFinalPoint - 1].getNull())
+	bool checkEnemy = false;
+	(map[size - (tempFigure2)][tempFigure - 1].getColor() == map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor()) ? checkEnemy = false : checkEnemy = true;
+	if (map[size - (tempFigure2)][tempFigure - 1].getNull() && ((!map[size - (tempFinalPoint2)][tempFinalPoint - 1].getNull() || checkEnemy)  ))
 	{
-		if (map[size - (tempFigure2)][tempFigure - 1].getValue() == 'H')
+		if (map[size - (tempFigure2)][tempFigure - 1].getValue() == u8"♘" || map[size - (tempFigure2)][tempFigure - 1].getValue() == u8"♞")
 		{
 			if (((tempFigure - tempFinalPoint == 1 || tempFigure - tempFinalPoint == -1) || (tempFigure - tempFinalPoint == 2 || tempFigure - tempFinalPoint == -2)) && ((tempFigure2 - tempFinalPoint2 == 1 || tempFigure2 - tempFinalPoint2 == -1) || (tempFigure2 - tempFinalPoint2 == 2 || tempFigure2 - tempFinalPoint2 == -2)))
 			{
-				map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('h');
-				map[size - (tempFigure2)][tempFigure - 1].setValue('n');
+				map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('h', map[size - (tempFigure2)][tempFigure - 1].getColor());
+				map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
 			}
 			else
 			{
@@ -332,33 +418,89 @@ void newStep(Figure** map, int size)
 				Sleep(1000);
 			}
 		}
-		if (map[size - (tempFigure2)][tempFigure - 1].getValue() == 'K')
+		if (map[size - (tempFigure2)][tempFigure - 1].getValue() == u8"♔" || map[size - (tempFigure2)][tempFigure - 1].getValue() == u8"♛")
 		{
-			map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('k');
-			map[size - (tempFigure2)][tempFigure - 1].setValue('n');
+			map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('k', map[size - (tempFigure2)][tempFigure - 1].getColor());
+			map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
 		}
-		if (map[size - (tempFigure2)][tempFigure - 1].getValue() == 'P')
+		if (map[size - (tempFigure2)][tempFigure - 1].getValue() == u8"♙" || map[size - (tempFigure2)][tempFigure - 1].getValue() == u8"♟")
 		{
-			if (tempFigure2 - tempFinalPoint2 == 1 || tempFigure2 - tempFinalPoint2 == -1)
+			if (map[size - (tempFigure2)][tempFigure - 1].getColor() == 'W')
 			{
-				if (size - (tempFinalPoint2) < size - (tempFigure2))
+				if (!map[size - (tempFinalPoint2)][tempFinalPoint - 1].getNull())
 				{
-					map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('p');
-					map[size - (tempFigure2)][tempFigure - 1].setValue('n');
+					if (tempFigure2 - tempFinalPoint2 == 1 || tempFigure2 - tempFinalPoint2 == -1)
+					{
+						if (size - (tempFinalPoint2) < size - (tempFigure2))
+						{
+							map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('p', map[size - (tempFigure2)][tempFigure - 1].getColor());
+							map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
+						}
+						else
+						{
+							std::cout << "Impossible move(" << std::endl;
+							Sleep(4000);
+						}
+					}
+					else
+					{
+						std::cout << "Impossible point(" << std::endl;
+						Sleep(4000);
+					}
 				}
 				else
 				{
-					std::cout << "Impossible move(" << std::endl;
-					Sleep(4000);
+					if (tempFinalPoint2 - tempFigure2 == 1 && tempFigure != tempFinalPoint && (tempFinalPoint - tempFigure == 1 || tempFinalPoint - tempFigure == -1))
+					{
+						map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('p', map[size - (tempFigure2)][tempFigure - 1].getColor());
+						map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
+					}
+					else
+					{
+						std::cout << "Impossible point(" << std::endl;
+						Sleep(4000);
+					}
 				}
 			}
 			else
 			{
-				std::cout << "Impossible point(" << std::endl;
-				Sleep(4000);
+				if (!map[size - (tempFinalPoint2)][tempFinalPoint - 1].getNull())
+				{
+					if (tempFigure2 - tempFinalPoint2 == 1 || tempFigure2 - tempFinalPoint2 == -1)
+					{
+						if (size - (tempFinalPoint2) > size - (tempFigure2))
+						{
+							map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('p', map[size - (tempFigure2)][tempFigure - 1].getColor());
+							map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
+						}
+						else
+						{
+							std::cout << "Impossible move(" << std::endl;
+							Sleep(4000);
+						}
+					}
+					else
+					{
+						std::cout << "Impossible point(" << std::endl;
+						Sleep(4000);
+					}
+				}
+				else
+				{
+					if (tempFinalPoint2 - tempFigure2 == -1 && tempFigure != tempFinalPoint && (tempFinalPoint - tempFigure == 1 || tempFinalPoint - tempFigure == -1))
+					{
+						map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('p', map[size - (tempFigure2)][tempFigure - 1].getColor());
+						map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
+					}
+					else
+					{
+						std::cout << "Impossible point(" << std::endl;
+						Sleep(4000);
+					}
+				}
 			}
 		}
-		if (map[size - (tempFigure2)][tempFigure - 1].getValue() == 'R')
+		if (map[size - (tempFigure2)][tempFigure - 1].getValue() == u8"♖" || map[size - (tempFigure2)][tempFigure - 1].getValue() == u8"♜")
 		{
 			int tempp = 0;
 			bool hair = true, falling = false;
@@ -397,8 +539,8 @@ void newStep(Figure** map, int size)
 						tempFigure2--;
 						if (!map[size - (tempFigure2)][tempFigure - 1].getNull())
 						{
-							map[size - (tempFigure2)][tempFigure - 1].setValue('r');
-							map[size - (tempFigure2 + 1)][tempFigure - 1].setValue('n');
+							map[size - (tempFigure2)][tempFigure - 1].setValue('r', map[size - (tempFigure2)][tempFigure - 1].getColor());
+							map[size - (tempFigure2 + 1)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
 						}
 						else
 						{
@@ -412,8 +554,8 @@ void newStep(Figure** map, int size)
 						tempFigure2++;
 						if(!map[size - (tempFigure2)][tempFigure - 1].getNull())
 						{
-							map[size - (tempFigure2)][tempFigure - 1].setValue('r');
-							map[size - (tempFigure2 - 1)][tempFigure - 1].setValue('n');
+							map[size - (tempFigure2)][tempFigure - 1].setValue('r', map[size - (tempFigure2)][tempFigure - 1].getColor());
+							map[size - (tempFigure2 - 1)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
 						}
 						else
 						{
@@ -427,8 +569,8 @@ void newStep(Figure** map, int size)
 						tempFigure--;
 						if(!map[size - (tempFigure2)][tempFigure - 1].getNull())
 						{
-							map[size - (tempFigure2)][tempFigure - 1].setValue('r');
-							map[size - (tempFigure2)][tempFigure].setValue('n');
+							map[size - (tempFigure2)][tempFigure - 1].setValue('r', map[size - (tempFigure2)][tempFigure - 1].getColor());
+							map[size - (tempFigure2)][tempFigure].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
 						}
 						else
 						{
@@ -442,8 +584,8 @@ void newStep(Figure** map, int size)
 						tempFigure++;
 						if(!map[size - (tempFigure2)][tempFigure - 1].getNull())
 						{
-							map[size - (tempFigure2)][tempFigure - 1].setValue('r');
-							map[size - (tempFigure2)][tempFigure-2].setValue('n');
+							map[size - (tempFigure2)][tempFigure - 1].setValue('r', map[size - (tempFigure2)][tempFigure - 1].getColor());
+							map[size - (tempFigure2)][tempFigure-2].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
 						}
 						else
 						{
@@ -498,7 +640,7 @@ void newStep(Figure** map, int size)
 	else if (finn == 'H' || finn == 'h')
 		tempFinalPoint = 8;
 	std::cin >> tempFinalPoint2; */
-		else if ((map[size - (tempFigure2)][tempFigure - 1].getValue() == 'E'))
+		else if ((map[size - (tempFigure2)][tempFigure - 1].getValue() == u8"♗") || (map[size - (tempFigure2)][tempFigure - 1].getValue() == u8"♝"))
 		{
 			
 					int temppf2 = tempFigure2;
@@ -516,8 +658,8 @@ void newStep(Figure** map, int size)
 					}
 					if (temppf == tempFinalPoint && temppf2 == tempFinalPoint2)
 					{
-						map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('e');
-						map[size - (tempFigure2)][tempFigure - 1].setValue('n');
+						map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('e', map[size - (tempFigure2)][tempFigure - 1].getColor());
+						map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
 						break;
 					}
 					if (temppf > tempFinalPoint && temppf2 > tempFinalPoint2)
@@ -542,8 +684,8 @@ void newStep(Figure** map, int size)
 					}
 					if (temppf == tempFinalPoint && temppf2 == tempFinalPoint2)
 					{
-						map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('e');
-						map[size - (tempFigure2)][tempFigure - 1].setValue('n');
+						map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('e', map[size - (tempFigure2)][tempFigure - 1].getColor());
+						map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
 						break;
 					}
 					if (temppf > tempFinalPoint && temppf2 < tempFinalPoint2)
@@ -568,8 +710,8 @@ void newStep(Figure** map, int size)
 					}
 					if (temppf == tempFinalPoint && temppf2 == tempFinalPoint2)
 					{
-						map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('e');
-						map[size - (tempFigure2)][tempFigure - 1].setValue('n');
+						map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('e', map[size - (tempFigure2)][tempFigure - 1].getColor());
+						map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
 						break;
 					}
 					if (temppf < tempFinalPoint && temppf2 > tempFinalPoint2)
@@ -594,8 +736,8 @@ void newStep(Figure** map, int size)
 					}
 					if (temppf == tempFinalPoint && temppf2 == tempFinalPoint2)
 					{
-						map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('e');
-						map[size - (tempFigure2)][tempFigure - 1].setValue('n');
+						map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('e', map[size - (tempFigure2)][tempFigure - 1].getColor());
+						map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
 						break;
 					}
 					if (temppf < tempFinalPoint && temppf2 < tempFinalPoint2)
@@ -608,7 +750,7 @@ void newStep(Figure** map, int size)
 				} while (true);
 			}
 		}
-		if (map[size - (tempFigure2)][tempFigure - 1].getValue() == 'Q')
+		if (map[size - (tempFigure2)][tempFigure - 1].getValue() == u8"♕")
 		{
 			if (((tempFigure - tempFinalPoint) == 0 || (tempFigure2 - tempFinalPoint2) == 0) || ((tempFigure + tempFinalPoint) == 0 || (tempFigure2 + tempFinalPoint2) == 0) || ((tempFigure + tempFinalPoint) == 0 || (tempFigure2 - tempFinalPoint2) == 0) || ((tempFigure - tempFinalPoint) == 0 || (tempFigure2 + tempFinalPoint2) == 0))
 			{
@@ -649,8 +791,8 @@ void newStep(Figure** map, int size)
 						tempFigure2--;
 						if (!map[size - (tempFigure2)][tempFigure - 1].getNull())
 						{
-							map[size - (tempFigure2)][tempFigure - 1].setValue('q');
-							map[size - (tempFigure2 + 1)][tempFigure - 1].setValue('n');
+							map[size - (tempFigure2)][tempFigure - 1].setValue('q', map[size - (tempFigure2)][tempFigure - 1].getColor());
+							map[size - (tempFigure2 + 1)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
 						}
 						else
 						{
@@ -664,8 +806,8 @@ void newStep(Figure** map, int size)
 						tempFigure2++;
 						if (!map[size - (tempFigure2)][tempFigure - 1].getNull())
 						{
-							map[size - (tempFigure2)][tempFigure - 1].setValue('q');
-							map[size - (tempFigure2 - 1)][tempFigure - 1].setValue('n');
+							map[size - (tempFigure2)][tempFigure - 1].setValue('q', map[size - (tempFigure2)][tempFigure - 1].getColor());
+							map[size - (tempFigure2 - 1)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
 						}
 						else
 						{
@@ -679,8 +821,8 @@ void newStep(Figure** map, int size)
 						tempFigure--;
 						if (!map[size - (tempFigure2)][tempFigure - 1].getNull())
 						{
-							map[size - (tempFigure2)][tempFigure - 1].setValue('q');
-							map[size - (tempFigure2)][tempFigure].setValue('n');
+							map[size - (tempFigure2)][tempFigure - 1].setValue('q', map[size - (tempFigure2)][tempFigure - 1].getColor());
+							map[size - (tempFigure2)][tempFigure].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
 						}
 						else
 						{
@@ -694,8 +836,8 @@ void newStep(Figure** map, int size)
 						tempFigure++;
 						if (!map[size - (tempFigure2)][tempFigure - 1].getNull())
 						{
-							map[size - (tempFigure2)][tempFigure - 1].setValue('q');
-							map[size - (tempFigure2)][tempFigure - 2].setValue('n');
+							map[size - (tempFigure2)][tempFigure - 1].setValue('q', map[size - (tempFigure2)][tempFigure - 1].getColor());
+							map[size - (tempFigure2)][tempFigure - 2].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
 						}
 						else
 						{
@@ -724,8 +866,8 @@ void newStep(Figure** map, int size)
 						}
 						if (temppf == tempFinalPoint && temppf2 == tempFinalPoint2)
 						{
-							map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('q');
-							map[size - (tempFigure2)][tempFigure - 1].setValue('n');
+							map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('q', map[size - (tempFigure2)][tempFigure - 1].getColor());
+							map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
 							break;
 						}
 						if (temppf > tempFinalPoint && temppf2 > tempFinalPoint2)
@@ -750,8 +892,8 @@ void newStep(Figure** map, int size)
 						}
 						if (temppf == tempFinalPoint && temppf2 == tempFinalPoint2)
 						{
-							map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('q');
-							map[size - (tempFigure2)][tempFigure - 1].setValue('n');
+							map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('q', map[size - (tempFigure2)][tempFigure - 1].getColor());
+							map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
 							break;
 						}
 						if (temppf > tempFinalPoint && temppf2 < tempFinalPoint2)
@@ -776,8 +918,8 @@ void newStep(Figure** map, int size)
 						}
 						if (temppf == tempFinalPoint && temppf2 == tempFinalPoint2)
 						{
-							map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('q');
-							map[size - (tempFigure2)][tempFigure - 1].setValue('n');
+							map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('q', map[size - (tempFigure2)][tempFigure - 1].getColor());
+							map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
 							break;
 						}
 						if (temppf < tempFinalPoint && temppf2 > tempFinalPoint2)
@@ -802,8 +944,8 @@ void newStep(Figure** map, int size)
 						}
 						if (temppf == tempFinalPoint && temppf2 == tempFinalPoint2)
 						{
-							map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('q');
-							map[size - (tempFigure2)][tempFigure - 1].setValue('n');
+							map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('q', map[size - (tempFigure2)][tempFigure - 1].getColor());
+							map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
 							break;
 						}
 						if (temppf < tempFinalPoint && temppf2 < tempFinalPoint2)
