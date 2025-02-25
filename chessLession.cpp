@@ -1,6 +1,7 @@
 #include <iostream>
-
-
+#include <chrono>
+#include <thread>
+#include <windows.h>
 
 class Horse
 {
@@ -77,7 +78,7 @@ class Quenn : public King
 protected:
 	bool Q = false;
 public:
-	
+
 	Quenn(bool Q)
 	{
 		this->Q = Q;
@@ -89,7 +90,10 @@ public:
 };
 class Figure : public Quenn
 {
-private:
+protected:
+	bool line = true;
+	bool straight = false;
+	bool zigzag = false;
 public:
 	Figure(char s)
 	{
@@ -104,6 +108,7 @@ public:
 		if (s == 'h')
 		{
 			this->H = true;
+			this->zigzag = true;
 		}
 		if (s == 'p')
 		{
@@ -120,12 +125,12 @@ public:
 	}
 	Figure()
 	{
-			this->K = false;
-			this->Q = false;
-			this->H = false;
-			this->P = false;
-			this->R = false;
-			this->E = false;
+		this->K = false;
+		this->Q = false;
+		this->H = false;
+		this->P = false;
+		this->R = false;
+		this->E = false;
 	}
 	char getValue()
 	{
@@ -163,19 +168,34 @@ public:
 		if (s == 'h')
 		{
 			this->H = true;
+			this->line = false;
+			this->zigzag = true;
 		}
 		if (s == 'p')
 		{
 			this->P = true;
+			this->straight = true;
 		}
 		if (s == 'r')
 		{
 			this->R = true;
+			this->straight = true;
 		}
 		if (s == 'e')
 		{
 			this->E = true;
 		}
+	}
+	int getNull()
+	{
+		if (this->K == false && this->Q == false && this->H == false && this->P == false && this->R == false && this->E == false)
+			return 0;
+		else
+			return 1;
+	}
+	bool getZigZag()
+	{
+		return this->zigzag;
 	}
 };
 
@@ -206,7 +226,7 @@ void printMap(Figure** map, int size)
 		std::cout << "   " << scrr << std::endl;
 		scrr--;
 	}
-	std::cout << "\n\nA" << ' ' << "B" << ' ' << "C" << ' ' << "D" << ' ' << "E" << ' ' << "F" << ' ' << "G" << ' ' << "H" << ' ' << std::endl;
+	std::cout << "\n\nA" << ' ' << "B" << ' ' << "C" << ' ' << "D" << ' ' << "E" << ' ' << "F" << ' ' << "G" << ' ' << "H" << ' ' << "           <<<<<<<<<<<<<------------" << std::endl;
 }
 
 void firstFillingMap(Figure** array, int size)
@@ -230,8 +250,8 @@ void firstFillingMap(Figure** array, int size)
 	array[7][5].setValue('e');
 	array[0][3].setValue('k');
 	array[7][3].setValue('k');
-	array[0][4].setValue('k');
-	array[7][4].setValue('k');
+	array[0][4].setValue('q');
+	array[7][4].setValue('q');
 }
 
 void newStep(Figure** array, int size);
@@ -243,8 +263,11 @@ int main()
 	firstFillingMap(map, size);
 	do
 	{
+		
 		printMap(map, size);
 		newStep(map, size);
+		
+		system("cls");
 	} while (true);
 }
 
@@ -278,7 +301,7 @@ void newStep(Figure** map, int size)
 	if (finn == 'A' || finn == 'a')
 		tempFinalPoint = 1;
 	else if (finn == 'B' || finn == 'b')
-		tempFinalPoint = 2; 
+		tempFinalPoint = 2;
 	else if (finn == 'C' || finn == 'c')
 		tempFinalPoint = 3;
 	else if (finn == 'D' || finn == 'd')
@@ -291,36 +314,157 @@ void newStep(Figure** map, int size)
 		tempFinalPoint = 7;
 	else if (finn == 'H' || finn == 'h')
 		tempFinalPoint = 8;
-	std::cin >> tempFinalPoint2;
-	if (map[tempFigure2 - 1][tempFigure - 1].getValue() == 'K')
+	std::cin >> tempFinalPoint2; 
+	if (map[size - (tempFigure2)][tempFigure - 1].getNull() && !map[size - (tempFinalPoint2)][tempFinalPoint - 1].getNull())
 	{
-		map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('k');
-		map[size - (tempFigure2)][tempFigure - 1].setValue('n');
+		if (map[size - (tempFigure2)][tempFigure - 1].getValue() == 'H')
+		{
+			if (((tempFigure - tempFinalPoint == 1 || tempFigure - tempFinalPoint == -1) || (tempFigure - tempFinalPoint == 2 || tempFigure - tempFinalPoint == -2)) && ((tempFigure2 - tempFinalPoint2 == 1 || tempFigure2 - tempFinalPoint2 == -1) || (tempFigure2 - tempFinalPoint2 == 2 || tempFigure2 - tempFinalPoint2 == -2)))
+			{
+				map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('h');
+				map[size - (tempFigure2)][tempFigure - 1].setValue('n');
+			}
+			else
+			{
+				std::cout << "Impossible point!!" << std::endl;
+				Sleep(1000);
+			}
+		}
+		if (map[size - (tempFigure2)][tempFigure - 1].getValue() == 'K')
+		{
+			map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('k');
+			map[size - (tempFigure2)][tempFigure - 1].setValue('n');
+		}
+		if (map[size - (tempFigure2)][tempFigure - 1].getValue() == 'P')
+		{
+			if (tempFigure2 - tempFinalPoint2 == 1 || tempFigure2 - tempFinalPoint2 == -1)
+			{
+				if (size - (tempFinalPoint2) < size - (tempFigure2))
+				{
+					map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('p');
+					map[size - (tempFigure2)][tempFigure - 1].setValue('n');
+				}
+				else
+				{
+					std::cout << "Impossible move(" << std::endl;
+					Sleep(4000);
+				}
+			}
+			else
+			{
+				std::cout << "Impossible point(" << std::endl;
+				Sleep(4000);
+			}
+		}
+		if (map[size - (tempFigure2)][tempFigure - 1].getValue() == 'R')
+		{
+			int tempp = 0;
+			bool hair = true, falling = false;
+			if (tempFigure2 - tempFinalPoint2 != 0)
+				hair = false;
+			if (hair)
+			{
+				std::cout << "YOF" << std::endl;
+				if (tempFigure > tempFinalPoint)
+				{
+					falling = true;
+					tempp = tempFigure - tempFinalPoint;
+				}
+				else
+				{
+					falling = false;
+					tempp = tempFinalPoint - tempFigure; 
+				}
+			}
+			else
+			{
+				std::cout << "YO" << std::endl;
+				if (tempFigure2 > tempFinalPoint2)
+				{
+					falling = true;
+					tempp = tempFigure2 - tempFinalPoint2;
+				}
+				else
+				{
+					falling = false;
+					tempp = tempFinalPoint2 - tempFigure2;
+				}
+			}
+				for (int i = 0;i < tempp; ++i)
+				{
+					if (falling && !hair)
+					{
+						tempFigure2--;
+						if (!map[size - (tempFigure2)][tempFigure - 1].getNull())
+						{
+							map[size - (tempFigure2)][tempFigure - 1].setValue('r');
+							map[size - (tempFigure2 + 1)][tempFigure - 1].setValue('n');
+						}
+						else
+						{
+							std::cout << "Impossible move" << std::endl;
+							Sleep(3000);
+							break;
+						}
+					}
+					else if (!falling && !hair)
+					{
+						tempFigure2++;
+						if(!map[size - (tempFigure2)][tempFigure - 1].getNull())
+						{
+							map[size - (tempFigure2)][tempFigure - 1].setValue('r');
+							map[size - (tempFigure2 - 1)][tempFigure - 1].setValue('n');
+						}
+						else
+						{
+							std::cout << "Impossible move" << std::endl;
+							Sleep(3000);
+							break;
+						}
+					}
+					else if (falling && hair)
+					{
+						tempFigure--;
+						if(!map[size - (tempFigure2)][tempFigure - 1].getNull())
+						{
+							map[size - (tempFigure2)][tempFigure - 1].setValue('r');
+							map[size - (tempFigure2)][tempFigure].setValue('n');
+						}
+						else
+						{
+							std::cout << "Impossible move" << std::endl;
+							Sleep(3000);
+							break;
+						}
+					}
+					else if (!falling && hair)
+					{
+						tempFigure++;
+						if(!map[size - (tempFigure2)][tempFigure - 1].getNull())
+						{
+							map[size - (tempFigure2)][tempFigure - 1].setValue('r');
+							map[size - (tempFigure2)][tempFigure-2].setValue('n');
+						}
+						else
+						{
+							std::cout << "Impossible move" << std::endl;
+							Sleep(3000);
+							break;
+						}
+					}
+				}
+
+			
+		}
+
+
+
+
 	}
-	else if (map[tempFigure2 - 1][tempFigure - 1].getValue() == 'Q')
+	else
 	{
-		map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('q');
-		map[size - (tempFigure2)][tempFigure - 1].setValue('n');
-	}
-	else if (map[tempFigure2 - 1][tempFigure - 1].getValue() == 'E')
-	{
-		map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('e');
-		map[size - (tempFigure2)][tempFigure - 1].setValue('n');
-	}
-	else if (map[tempFigure2 - 1][tempFigure - 1].getValue() == 'R')
-	{
-		map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('r');
-		map[size - (tempFigure2)][tempFigure - 1].setValue('n');
-	}
-	else if (map[tempFigure2 - 1][tempFigure - 1].getValue() == 'P')
-	{
-		map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('p');
-		map[size - (tempFigure2)][tempFigure - 1].setValue('n');
-	}
-	else if (map[tempFigure2 - 1][tempFigure - 1].getValue() == 'H')
-	{
-		map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('h');
-		map[size - (tempFigure2)][tempFigure - 1].setValue('n');
+		std::cout << "Impossible point(" << std::endl;
+		Sleep(4000);
 	}
 
 }
