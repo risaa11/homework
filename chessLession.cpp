@@ -133,7 +133,7 @@ public:
 		this->R = false;
 		this->E = false;
 	}
-	
+
 	const char* getValue()
 	{
 		if (this->whiteColor)
@@ -172,7 +172,7 @@ public:
 		}
 
 	}
-	
+
 	void setValue(char s, char c)
 	{
 		if (c == 'W' || c == 'w')
@@ -220,46 +220,46 @@ public:
 		}
 		else
 		{
-				this->K = false;
-				this->Q = false;
-				this->H = false;
-				this->P = false;
-				this->R = false;
-				this->E = false;
-				if (s == 'k')
-				{
-					this->K = true;
-					this->whiteColor = false;
-				}
-				if (s == 'q')
-				{
-					this->Q = true;
-					this->whiteColor = false;
-				}
-				if (s == 'h')
-				{
-					this->H = true;
-					this->line = false;
-					this->zigzag = true;
-					this->whiteColor = false;
-				}
-				if (s == 'p')
-				{
-					this->P = true;
-					this->straight = true;
-					this->whiteColor = false;
-				}
-				if (s == 'r')
-				{
-					this->R = true;
-					this->straight = true;
-					this->whiteColor = false;
-				}
-				if (s == 'e')
-				{
-					this->E = true;
-					this->whiteColor = false;
-				}
+			this->K = false;
+			this->Q = false;
+			this->H = false;
+			this->P = false;
+			this->R = false;
+			this->E = false;
+			if (s == 'k')
+			{
+				this->K = true;
+				this->whiteColor = false;
+			}
+			if (s == 'q')
+			{
+				this->Q = true;
+				this->whiteColor = false;
+			}
+			if (s == 'h')
+			{
+				this->H = true;
+				this->line = false;
+				this->zigzag = true;
+				this->whiteColor = false;
+			}
+			if (s == 'p')
+			{
+				this->P = true;
+				this->straight = true;
+				this->whiteColor = false;
+			}
+			if (s == 'r')
+			{
+				this->R = true;
+				this->straight = true;
+				this->whiteColor = false;
+			}
+			if (s == 'e')
+			{
+				this->E = true;
+				this->whiteColor = false;
+			}
 		}
 	}
 
@@ -272,9 +272,9 @@ public:
 	{
 		return this->zigzag;
 	}
-	 char getColor()
+	char getColor()
 	{
-		 return (whiteColor) ? 'W' : 'B';
+		return (whiteColor) ? 'W' : 'B';
 	}
 };
 
@@ -335,6 +335,522 @@ void firstFillingMap(Figure** array, int size)
 }
 
 void newStep(Figure** array, int size);
+
+void quennStep(int tempFigure, int tempFinalPoint, Figure** map, int size, int tempFigure2, int tempFinalPoint2)
+{
+	if (((tempFigure - tempFinalPoint) == 0 || (tempFigure2 - tempFinalPoint2) == 0) || ((tempFigure + tempFinalPoint) == 0 || (tempFigure2 + tempFinalPoint2) == 0) || ((tempFigure + tempFinalPoint) == 0 || (tempFigure2 - tempFinalPoint2) == 0) || ((tempFigure - tempFinalPoint) == 0 || (tempFigure2 + tempFinalPoint2) == 0))
+	{
+		int tempp = 0;
+		bool hair = true, falling = false;
+		if (tempFigure2 - tempFinalPoint2 != 0)
+			hair = false;
+		if (hair)
+		{
+			if (tempFigure > tempFinalPoint)
+			{
+				falling = true;
+				tempp = tempFigure - tempFinalPoint;
+			}
+			else
+			{
+				falling = false;
+				tempp = tempFinalPoint - tempFigure;
+			}
+		}
+		else
+		{
+			if (tempFigure2 > tempFinalPoint2)
+			{
+				falling = true;
+				tempp = tempFigure2 - tempFinalPoint2;
+			}
+			else
+			{
+				falling = false;
+				tempp = tempFinalPoint2 - tempFigure2;
+			}
+		}
+		for (int i = 0;i < tempp; ++i)
+		{
+			if (falling && !hair)
+			{
+				tempFigure2--;
+				if (!map[size - (tempFigure2)][tempFigure - 1].getNull())
+				{
+					map[size - (tempFigure2)][tempFigure - 1].setValue('q', map[size - (tempFigure2)][tempFigure - 1].getColor());
+					map[size - (tempFigure2 + 1)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
+				}
+				else
+				{
+					std::cout << "Impossible move" << std::endl;
+					Sleep(3000);
+					break;
+				}
+			}
+			else if (!falling && !hair)
+			{
+				tempFigure2++;
+				if (!map[size - (tempFigure2)][tempFigure - 1].getNull())
+				{
+					map[size - (tempFigure2)][tempFigure - 1].setValue('q', map[size - (tempFigure2)][tempFigure - 1].getColor());
+					map[size - (tempFigure2 - 1)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
+				}
+				else
+				{
+					std::cout << "Impossible move" << std::endl;
+					Sleep(3000);
+					break;
+				}
+			}
+			else if (falling && hair)
+			{
+				tempFigure--;
+				if (!map[size - (tempFigure2)][tempFigure - 1].getNull())
+				{
+					map[size - (tempFigure2)][tempFigure - 1].setValue('q', map[size - (tempFigure2)][tempFigure - 1].getColor());
+					map[size - (tempFigure2)][tempFigure].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
+				}
+				else
+				{
+					std::cout << "Impossible move" << std::endl;
+					Sleep(3000);
+					break;
+				}
+			}
+			else if (!falling && hair)
+			{
+				tempFigure++;
+				if (!map[size - (tempFigure2)][tempFigure - 1].getNull())
+				{
+					map[size - (tempFigure2)][tempFigure - 1].setValue('q', map[size - (tempFigure2)][tempFigure - 1].getColor());
+					map[size - (tempFigure2)][tempFigure - 2].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
+				}
+				else
+				{
+					std::cout << "Impossible move" << std::endl;
+					Sleep(3000);
+					break;
+				}
+			}
+		}
+
+	}
+	else
+	{
+		int temppf2 = tempFigure2;
+		int temppf = tempFigure;
+		if (tempFigure < tempFinalPoint && tempFigure2 < tempFinalPoint2)
+		{
+			do {
+				temppf++;
+				temppf2++;
+				if (map[size - (temppf2)][temppf - 1].getNull())
+				{
+					std::cout << "Impossible move" << std::endl;
+					Sleep(1000);
+					break;
+				}
+				if (temppf == tempFinalPoint && temppf2 == tempFinalPoint2)
+				{
+					map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('q', map[size - (tempFigure2)][tempFigure - 1].getColor());
+					map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
+					break;
+				}
+				if (temppf > tempFinalPoint && temppf2 > tempFinalPoint2)
+				{
+					std::cout << "No Quenn!!" << std::endl;
+					Sleep(2000);
+					break;
+				}
+
+			} while (true);
+		}
+		else if (tempFigure < tempFinalPoint && tempFigure2 > tempFinalPoint2)
+		{
+			do {
+				temppf++;
+				temppf2--;
+				if (map[size - (temppf2)][temppf - 1].getNull())
+				{
+					std::cout << "Impossible move" << std::endl;
+					Sleep(1000);
+					break;
+				}
+				if (temppf == tempFinalPoint && temppf2 == tempFinalPoint2)
+				{
+					map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('q', map[size - (tempFigure2)][tempFigure - 1].getColor());
+					map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
+					break;
+				}
+				if (temppf > tempFinalPoint && temppf2 < tempFinalPoint2)
+				{
+					std::cout << "No Quenn!!" << std::endl;
+					Sleep(2000);
+					break;
+				}
+
+			} while (true);
+		}
+		else if (tempFigure > tempFinalPoint && tempFigure2 < tempFinalPoint2)
+		{
+			do {
+				temppf--;
+				temppf2++;
+				if (map[size - (temppf2)][temppf - 1].getNull())
+				{
+					std::cout << "Impossible move" << std::endl;
+					Sleep(1000);
+					break;
+				}
+				if (temppf == tempFinalPoint && temppf2 == tempFinalPoint2)
+				{
+					map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('q', map[size - (tempFigure2)][tempFigure - 1].getColor());
+					map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
+					break;
+				}
+				if (temppf < tempFinalPoint && temppf2 > tempFinalPoint2)
+				{
+					std::cout << "No Quenn!!" << std::endl;
+					Sleep(2000);
+					break;
+				}
+
+			} while (true);
+		}
+		else if (tempFigure > tempFinalPoint && tempFigure2 > tempFinalPoint2)
+		{
+			do {
+				temppf--;
+				temppf2--;
+				if (map[size - (temppf2)][temppf - 1].getNull())
+				{
+					std::cout << "Impossible move" << std::endl;
+					Sleep(1000);
+					break;
+				}
+				if (temppf == tempFinalPoint && temppf2 == tempFinalPoint2)
+				{
+					map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('q', map[size - (tempFigure2)][tempFigure - 1].getColor());
+					map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
+					break;
+				}
+				if (temppf < tempFinalPoint && temppf2 < tempFinalPoint2)
+				{
+					std::cout << "No Quenn!!" << std::endl;
+					Sleep(2000);
+					break;
+				}
+
+			} while (true);
+		}
+
+	}
+}
+
+void pStep(int tempFigure, int tempFinalPoint, Figure** map, int size, int tempFigure2, int tempFinalPoint2)
+{
+	if (map[size - (tempFigure2)][tempFigure - 1].getColor() == 'W')
+	{
+		if (!map[size - (tempFinalPoint2)][tempFinalPoint - 1].getNull())
+		{
+			if (tempFigure2 - tempFinalPoint2 == 1 || tempFigure2 - tempFinalPoint2 == -1)
+			{
+				if (size - (tempFinalPoint2) < size - (tempFigure2))
+				{
+					map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('p', map[size - (tempFigure2)][tempFigure - 1].getColor());
+					map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
+				}
+				else
+				{
+					std::cout << "Impossible move(" << std::endl;
+					Sleep(4000);
+				}
+			}
+			else
+			{
+				std::cout << "Impossible point(" << std::endl;
+				Sleep(4000);
+			}
+		}
+		else
+		{
+			if (tempFinalPoint2 - tempFigure2 == 1 && tempFigure != tempFinalPoint && (tempFinalPoint - tempFigure == 1 || tempFinalPoint - tempFigure == -1))
+			{
+				map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('p', map[size - (tempFigure2)][tempFigure - 1].getColor());
+				map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
+			}
+			else
+			{
+				std::cout << "Impossible point(" << std::endl;
+				Sleep(4000);
+			}
+		}
+	}
+	else
+	{
+		if (!map[size - (tempFinalPoint2)][tempFinalPoint - 1].getNull())
+		{
+			if (tempFigure2 - tempFinalPoint2 == 1 || tempFigure2 - tempFinalPoint2 == -1)
+			{
+				if (size - (tempFinalPoint2) > size - (tempFigure2))
+				{
+					map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('p', map[size - (tempFigure2)][tempFigure - 1].getColor());
+					map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
+				}
+				else
+				{
+					std::cout << "Impossible move(" << std::endl;
+					Sleep(4000);
+				}
+			}
+			else
+			{
+				std::cout << "Impossible point(" << std::endl;
+				Sleep(4000);
+			}
+		}
+		else
+		{
+			if (tempFinalPoint2 - tempFigure2 == -1 && tempFigure != tempFinalPoint && (tempFinalPoint - tempFigure == 1 || tempFinalPoint - tempFigure == -1))
+			{
+				map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('p', map[size - (tempFigure2)][tempFigure - 1].getColor());
+				map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
+			}
+			else
+			{
+				std::cout << "Impossible point(" << std::endl;
+				Sleep(4000);
+			}
+		}
+	}
+}
+
+void kStep(int tempFigure, int tempFinalPoint, Figure** map, int size, int tempFigure2, int tempFinalPoint2)
+{
+	map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('k', map[size - (tempFigure2)][tempFigure - 1].getColor());
+	map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
+}
+
+void rStep(int tempFigure, int tempFinalPoint, Figure** map, int size, int tempFigure2, int tempFinalPoint2)
+{
+	int tempp = 0;
+	bool hair = true, falling = false;
+	if (tempFigure2 - tempFinalPoint2 != 0)
+		hair = false;
+	if (hair)
+	{
+		if (tempFigure > tempFinalPoint)
+		{
+			falling = true;
+			tempp = tempFigure - tempFinalPoint;
+		}
+		else
+		{
+			falling = false;
+			tempp = tempFinalPoint - tempFigure;
+		}
+	}
+	else
+	{
+		if (tempFigure2 > tempFinalPoint2)
+		{
+			falling = true;
+			tempp = tempFigure2 - tempFinalPoint2;
+		}
+		else
+		{
+			falling = false;
+			tempp = tempFinalPoint2 - tempFigure2;
+		}
+	}
+	for (int i = 0;i < tempp; ++i)
+	{
+		if (falling && !hair)
+		{
+			tempFigure2--;
+			if (!map[size - (tempFigure2)][tempFigure - 1].getNull())
+			{
+				map[size - (tempFigure2)][tempFigure - 1].setValue('r', map[size - (tempFigure2)][tempFigure - 1].getColor());
+				map[size - (tempFigure2 + 1)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
+			}
+			else
+			{
+				std::cout << "Impossible move" << std::endl;
+				Sleep(3000);
+				break;
+			}
+		}
+		else if (!falling && !hair)
+		{
+			tempFigure2++;
+			if (!map[size - (tempFigure2)][tempFigure - 1].getNull())
+			{
+				map[size - (tempFigure2)][tempFigure - 1].setValue('r', map[size - (tempFigure2)][tempFigure - 1].getColor());
+				map[size - (tempFigure2 - 1)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
+			}
+			else
+			{
+				std::cout << "Impossible move" << std::endl;
+				Sleep(3000);
+				break;
+			}
+		}
+		else if (falling && hair)
+		{
+			tempFigure--;
+			if (!map[size - (tempFigure2)][tempFigure - 1].getNull())
+			{
+				map[size - (tempFigure2)][tempFigure - 1].setValue('r', map[size - (tempFigure2)][tempFigure - 1].getColor());
+				map[size - (tempFigure2)][tempFigure].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
+			}
+			else
+			{
+				std::cout << "Impossible move" << std::endl;
+				Sleep(3000);
+				break;
+			}
+		}
+		else if (!falling && hair)
+		{
+			tempFigure++;
+			if (!map[size - (tempFigure2)][tempFigure - 1].getNull())
+			{
+				map[size - (tempFigure2)][tempFigure - 1].setValue('r', map[size - (tempFigure2)][tempFigure - 1].getColor());
+				map[size - (tempFigure2)][tempFigure - 2].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
+			}
+			else
+			{
+				std::cout << "Impossible move" << std::endl;
+				Sleep(3000);
+				break;
+			}
+		}
+	}
+}
+
+void eStep(int tempFigure, int tempFinalPoint, Figure** map, int size, int tempFigure2, int tempFinalPoint2)
+{
+	int temppf2 = tempFigure2;
+	int temppf = tempFigure;
+	if (tempFigure < tempFinalPoint && tempFigure2 < tempFinalPoint2)
+	{
+		do {
+			temppf++;
+			temppf2++;
+			if (map[size - (temppf2)][temppf - 1].getNull())
+			{
+				std::cout << "Impossible move" << std::endl;
+				Sleep(1000);
+				break;
+			}
+			if (temppf == tempFinalPoint && temppf2 == tempFinalPoint2)
+			{
+				map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('e', map[size - (tempFigure2)][tempFigure - 1].getColor());
+				map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
+				break;
+			}
+			if (temppf > tempFinalPoint && temppf2 > tempFinalPoint2)
+			{
+				std::cout << "No eliph!!" << std::endl;
+				Sleep(2000);
+				break;
+			}
+
+		} while (true);
+	}
+	else if (tempFigure < tempFinalPoint && tempFigure2 > tempFinalPoint2)
+	{
+		do {
+			temppf++;
+			temppf2--;
+			if (map[size - (temppf2)][temppf - 1].getNull())
+			{
+				std::cout << "Impossible move" << std::endl;
+				Sleep(1000);
+				break;
+			}
+			if (temppf == tempFinalPoint && temppf2 == tempFinalPoint2)
+			{
+				map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('e', map[size - (tempFigure2)][tempFigure - 1].getColor());
+				map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
+				break;
+			}
+			if (temppf > tempFinalPoint && temppf2 < tempFinalPoint2)
+			{
+				std::cout << "No eliph!!" << std::endl;
+				Sleep(2000);
+				break;
+			}
+
+		} while (true);
+	}
+	else if (tempFigure > tempFinalPoint && tempFigure2 < tempFinalPoint2)
+	{
+		do {
+			temppf--;
+			temppf2++;
+			if (map[size - (temppf2)][temppf - 1].getNull())
+			{
+				std::cout << "Impossible move" << std::endl;
+				Sleep(1000);
+				break;
+			}
+			if (temppf == tempFinalPoint && temppf2 == tempFinalPoint2)
+			{
+				map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('e', map[size - (tempFigure2)][tempFigure - 1].getColor());
+				map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
+				break;
+			}
+			if (temppf < tempFinalPoint && temppf2 > tempFinalPoint2)
+			{
+				std::cout << "No eliph!!" << std::endl;
+				Sleep(2000);
+				break;
+			}
+
+		} while (true);
+	}
+	else if (tempFigure > tempFinalPoint && tempFigure2 > tempFinalPoint2)
+	{
+		do {
+			temppf--;
+			temppf2--;
+			if (map[size - (temppf2)][temppf - 1].getNull())
+			{
+				std::cout << "Impossible move" << std::endl;
+				Sleep(1000);
+				break;
+			}
+			if (temppf == tempFinalPoint && temppf2 == tempFinalPoint2)
+			{
+				map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('e', map[size - (tempFigure2)][tempFigure - 1].getColor());
+				map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
+				break;
+			}
+			if (temppf < tempFinalPoint && temppf2 < tempFinalPoint2)
+			{
+				std::cout << "No eliph!!" << std::endl;
+				Sleep(2000);
+				break;
+			}
+
+		} while (true);
+	}
+}
+
+void hStep(int tempFigure, int tempFinalPoint, Figure** map, int size, int tempFigure2, int tempFinalPoint2)
+{
+	if (((tempFigure - tempFinalPoint == 1 || tempFigure - tempFinalPoint == -1) || (tempFigure - tempFinalPoint == 2 || tempFigure - tempFinalPoint == -2)) && ((tempFigure2 - tempFinalPoint2 == 1 || tempFigure2 - tempFinalPoint2 == -1) || (tempFigure2 - tempFinalPoint2 == 2 || tempFigure2 - tempFinalPoint2 == -2)))
+	{
+		map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('h', map[size - (tempFigure2)][tempFigure - 1].getColor());
+		map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
+	}
+	else
+	{
+		std::cout << "Impossible point!!" << std::endl;
+		Sleep(1000);
+	}
+}
 
 int main()
 {
@@ -400,203 +916,26 @@ void newStep(Figure** map, int size)
 		tempFinalPoint = 7;
 	else if (finn == 'H' || finn == 'h')
 		tempFinalPoint = 8;
-	std::cin >> tempFinalPoint2; 
+	std::cin >> tempFinalPoint2;
 	bool checkEnemy = false;
 	(map[size - (tempFigure2)][tempFigure - 1].getColor() == map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor()) ? checkEnemy = false : checkEnemy = true;
-	if (map[size - (tempFigure2)][tempFigure - 1].getNull() && ((!map[size - (tempFinalPoint2)][tempFinalPoint - 1].getNull() || checkEnemy)  ))
+	if (map[size - (tempFigure2)][tempFigure - 1].getNull() && ((!map[size - (tempFinalPoint2)][tempFinalPoint - 1].getNull() || checkEnemy)))
 	{
 		if (map[size - (tempFigure2)][tempFigure - 1].getValue() == u8"♘" || map[size - (tempFigure2)][tempFigure - 1].getValue() == u8"♞")
 		{
-			if (((tempFigure - tempFinalPoint == 1 || tempFigure - tempFinalPoint == -1) || (tempFigure - tempFinalPoint == 2 || tempFigure - tempFinalPoint == -2)) && ((tempFigure2 - tempFinalPoint2 == 1 || tempFigure2 - tempFinalPoint2 == -1) || (tempFigure2 - tempFinalPoint2 == 2 || tempFigure2 - tempFinalPoint2 == -2)))
-			{
-				map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('h', map[size - (tempFigure2)][tempFigure - 1].getColor());
-				map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
-			}
-			else
-			{
-				std::cout << "Impossible point!!" << std::endl;
-				Sleep(1000);
-			}
+			hStep(tempFigure, tempFinalPoint, map, size, tempFigure2, tempFinalPoint2);
 		}
-		if (map[size - (tempFigure2)][tempFigure - 1].getValue() == u8"♔" || map[size - (tempFigure2)][tempFigure - 1].getValue() == u8"♛")
+		else if (map[size - (tempFigure2)][tempFigure - 1].getValue() == u8"♔" || map[size - (tempFigure2)][tempFigure - 1].getValue() == u8"♛")
 		{
-			map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('k', map[size - (tempFigure2)][tempFigure - 1].getColor());
-			map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
+			kStep(tempFigure, tempFinalPoint, map, size, tempFigure2, tempFinalPoint2);
 		}
-		if (map[size - (tempFigure2)][tempFigure - 1].getValue() == u8"♙" || map[size - (tempFigure2)][tempFigure - 1].getValue() == u8"♟")
+		else if (map[size - (tempFigure2)][tempFigure - 1].getValue() == u8"♙" || map[size - (tempFigure2)][tempFigure - 1].getValue() == u8"♟")
 		{
-			if (map[size - (tempFigure2)][tempFigure - 1].getColor() == 'W')
-			{
-				if (!map[size - (tempFinalPoint2)][tempFinalPoint - 1].getNull())
-				{
-					if (tempFigure2 - tempFinalPoint2 == 1 || tempFigure2 - tempFinalPoint2 == -1)
-					{
-						if (size - (tempFinalPoint2) < size - (tempFigure2))
-						{
-							map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('p', map[size - (tempFigure2)][tempFigure - 1].getColor());
-							map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
-						}
-						else
-						{
-							std::cout << "Impossible move(" << std::endl;
-							Sleep(4000);
-						}
-					}
-					else
-					{
-						std::cout << "Impossible point(" << std::endl;
-						Sleep(4000);
-					}
-				}
-				else
-				{
-					if (tempFinalPoint2 - tempFigure2 == 1 && tempFigure != tempFinalPoint && (tempFinalPoint - tempFigure == 1 || tempFinalPoint - tempFigure == -1))
-					{
-						map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('p', map[size - (tempFigure2)][tempFigure - 1].getColor());
-						map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
-					}
-					else
-					{
-						std::cout << "Impossible point(" << std::endl;
-						Sleep(4000);
-					}
-				}
-			}
-			else
-			{
-				if (!map[size - (tempFinalPoint2)][tempFinalPoint - 1].getNull())
-				{
-					if (tempFigure2 - tempFinalPoint2 == 1 || tempFigure2 - tempFinalPoint2 == -1)
-					{
-						if (size - (tempFinalPoint2) > size - (tempFigure2))
-						{
-							map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('p', map[size - (tempFigure2)][tempFigure - 1].getColor());
-							map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
-						}
-						else
-						{
-							std::cout << "Impossible move(" << std::endl;
-							Sleep(4000);
-						}
-					}
-					else
-					{
-						std::cout << "Impossible point(" << std::endl;
-						Sleep(4000);
-					}
-				}
-				else
-				{
-					if (tempFinalPoint2 - tempFigure2 == -1 && tempFigure != tempFinalPoint && (tempFinalPoint - tempFigure == 1 || tempFinalPoint - tempFigure == -1))
-					{
-						map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('p', map[size - (tempFigure2)][tempFigure - 1].getColor());
-						map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
-					}
-					else
-					{
-						std::cout << "Impossible point(" << std::endl;
-						Sleep(4000);
-					}
-				}
-			}
+			pStep(tempFigure, tempFinalPoint, map, size, tempFigure2, tempFinalPoint2);
 		}
 		if (map[size - (tempFigure2)][tempFigure - 1].getValue() == u8"♖" || map[size - (tempFigure2)][tempFigure - 1].getValue() == u8"♜")
 		{
-			int tempp = 0;
-			bool hair = true, falling = false;
-			if (tempFigure2 - tempFinalPoint2 != 0)
-				hair = false;
-			if (hair)
-			{
-				if (tempFigure > tempFinalPoint)
-				{
-					falling = true;
-					tempp = tempFigure - tempFinalPoint;
-				}
-				else
-				{
-					falling = false;
-					tempp = tempFinalPoint - tempFigure; 
-				}
-			}
-			else
-			{
-				if (tempFigure2 > tempFinalPoint2)
-				{
-					falling = true;
-					tempp = tempFigure2 - tempFinalPoint2;
-				}
-				else
-				{
-					falling = false;
-					tempp = tempFinalPoint2 - tempFigure2;
-				}
-			}
-				for (int i = 0;i < tempp; ++i)
-				{
-					if (falling && !hair)
-					{
-						tempFigure2--;
-						if (!map[size - (tempFigure2)][tempFigure - 1].getNull())
-						{
-							map[size - (tempFigure2)][tempFigure - 1].setValue('r', map[size - (tempFigure2)][tempFigure - 1].getColor());
-							map[size - (tempFigure2 + 1)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
-						}
-						else
-						{
-							std::cout << "Impossible move" << std::endl;
-							Sleep(3000);
-							break;
-						}
-					}
-					else if (!falling && !hair)
-					{
-						tempFigure2++;
-						if(!map[size - (tempFigure2)][tempFigure - 1].getNull())
-						{
-							map[size - (tempFigure2)][tempFigure - 1].setValue('r', map[size - (tempFigure2)][tempFigure - 1].getColor());
-							map[size - (tempFigure2 - 1)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
-						}
-						else
-						{
-							std::cout << "Impossible move" << std::endl;
-							Sleep(3000);
-							break;
-						}
-					}
-					else if (falling && hair)
-					{
-						tempFigure--;
-						if(!map[size - (tempFigure2)][tempFigure - 1].getNull())
-						{
-							map[size - (tempFigure2)][tempFigure - 1].setValue('r', map[size - (tempFigure2)][tempFigure - 1].getColor());
-							map[size - (tempFigure2)][tempFigure].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
-						}
-						else
-						{
-							std::cout << "Impossible move" << std::endl;
-							Sleep(3000);
-							break;
-						}
-					}
-					else if (!falling && hair)
-					{
-						tempFigure++;
-						if(!map[size - (tempFigure2)][tempFigure - 1].getNull())
-						{
-							map[size - (tempFigure2)][tempFigure - 1].setValue('r', map[size - (tempFigure2)][tempFigure - 1].getColor());
-							map[size - (tempFigure2)][tempFigure-2].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
-						}
-						else
-						{
-							std::cout << "Impossible move" << std::endl;
-							Sleep(3000);
-							break;
-						}
-					}
-				}
-
-			
+			rStep(tempFigure, tempFinalPoint, map, size, tempFigure2, tempFinalPoint2);
 		}
 		/*int tempFigure = 0, tempFigure2 = 0;
 	char figg;
@@ -642,323 +981,12 @@ void newStep(Figure** map, int size)
 	std::cin >> tempFinalPoint2; */
 		else if ((map[size - (tempFigure2)][tempFigure - 1].getValue() == u8"♗") || (map[size - (tempFigure2)][tempFigure - 1].getValue() == u8"♝"))
 		{
-			
-					int temppf2 = tempFigure2;
-					int temppf = tempFigure;
-			if (tempFigure < tempFinalPoint && tempFigure2 < tempFinalPoint2)
-			{
-				do {
-					temppf++;
-					temppf2++;
-					if (map[size - (temppf2)][temppf - 1].getNull())
-					{
-						std::cout << "Impossible move" << std::endl;
-						Sleep(1000);
-						break;
-					}
-					if (temppf == tempFinalPoint && temppf2 == tempFinalPoint2)
-					{
-						map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('e', map[size - (tempFigure2)][tempFigure - 1].getColor());
-						map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
-						break;
-					}
-					if (temppf > tempFinalPoint && temppf2 > tempFinalPoint2)
-					{
-						std::cout << "No eliph!!" << std::endl;
-						Sleep(2000);
-						break;
-					}
 
-				} while (true);
-			}
-			else if (tempFigure < tempFinalPoint && tempFigure2 > tempFinalPoint2)
-			{
-				do {
-					temppf++;
-					temppf2--;
-					if (map[size - (temppf2)][temppf - 1].getNull())
-					{
-						std::cout << "Impossible move" << std::endl;
-						Sleep(1000);
-						break;
-					}
-					if (temppf == tempFinalPoint && temppf2 == tempFinalPoint2)
-					{
-						map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('e', map[size - (tempFigure2)][tempFigure - 1].getColor());
-						map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
-						break;
-					}
-					if (temppf > tempFinalPoint && temppf2 < tempFinalPoint2)
-					{
-						std::cout << "No eliph!!" << std::endl;
-						Sleep(2000);
-						break;
-					}
-
-				} while (true);
-			}
-			else if (tempFigure > tempFinalPoint && tempFigure2 < tempFinalPoint2)
-			{
-				do {
-					temppf--;
-					temppf2++;
-					if (map[size - (temppf2)][temppf - 1].getNull())
-					{
-						std::cout << "Impossible move" << std::endl;
-						Sleep(1000);
-						break;
-					}
-					if (temppf == tempFinalPoint && temppf2 == tempFinalPoint2)
-					{
-						map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('e', map[size - (tempFigure2)][tempFigure - 1].getColor());
-						map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
-						break;
-					}
-					if (temppf < tempFinalPoint && temppf2 > tempFinalPoint2)
-					{
-						std::cout << "No eliph!!" << std::endl;
-						Sleep(2000);
-						break;
-					}
-
-				} while (true);
-			}
-			else if (tempFigure > tempFinalPoint && tempFigure2 > tempFinalPoint2)
-			{
-				do {
-					temppf--;
-					temppf2--;
-					if (map[size - (temppf2)][temppf - 1].getNull())
-					{
-						std::cout << "Impossible move" << std::endl;
-						Sleep(1000);
-						break;
-					}
-					if (temppf == tempFinalPoint && temppf2 == tempFinalPoint2)
-					{
-						map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('e', map[size - (tempFigure2)][tempFigure - 1].getColor());
-						map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
-						break;
-					}
-					if (temppf < tempFinalPoint && temppf2 < tempFinalPoint2)
-					{
-						std::cout << "No eliph!!" << std::endl;
-						Sleep(2000);
-						break;
-					}
-
-				} while (true);
-			}
+			eStep(tempFigure, tempFinalPoint, map, size, tempFigure2, tempFinalPoint2);
 		}
 		if (map[size - (tempFigure2)][tempFigure - 1].getValue() == u8"♕")
 		{
-			if (((tempFigure - tempFinalPoint) == 0 || (tempFigure2 - tempFinalPoint2) == 0) || ((tempFigure + tempFinalPoint) == 0 || (tempFigure2 + tempFinalPoint2) == 0) || ((tempFigure + tempFinalPoint) == 0 || (tempFigure2 - tempFinalPoint2) == 0) || ((tempFigure - tempFinalPoint) == 0 || (tempFigure2 + tempFinalPoint2) == 0))
-			{
-				int tempp = 0;
-				bool hair = true, falling = false;
-				if (tempFigure2 - tempFinalPoint2 != 0)
-					hair = false;
-				if (hair)
-				{
-					if (tempFigure > tempFinalPoint)
-					{
-						falling = true;
-						tempp = tempFigure - tempFinalPoint;
-					}
-					else
-					{
-						falling = false;
-						tempp = tempFinalPoint - tempFigure;
-					}
-				}
-				else
-				{
-					if (tempFigure2 > tempFinalPoint2)
-					{
-						falling = true;
-						tempp = tempFigure2 - tempFinalPoint2;
-					}
-					else
-					{
-						falling = false;
-						tempp = tempFinalPoint2 - tempFigure2;
-					}
-				}
-				for (int i = 0;i < tempp; ++i)
-				{
-					if (falling && !hair)
-					{
-						tempFigure2--;
-						if (!map[size - (tempFigure2)][tempFigure - 1].getNull())
-						{
-							map[size - (tempFigure2)][tempFigure - 1].setValue('q', map[size - (tempFigure2)][tempFigure - 1].getColor());
-							map[size - (tempFigure2 + 1)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
-						}
-						else
-						{
-							std::cout << "Impossible move" << std::endl;
-							Sleep(3000);
-							break;
-						}
-					}
-					else if (!falling && !hair)
-					{
-						tempFigure2++;
-						if (!map[size - (tempFigure2)][tempFigure - 1].getNull())
-						{
-							map[size - (tempFigure2)][tempFigure - 1].setValue('q', map[size - (tempFigure2)][tempFigure - 1].getColor());
-							map[size - (tempFigure2 - 1)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
-						}
-						else
-						{
-							std::cout << "Impossible move" << std::endl;
-							Sleep(3000);
-							break;
-						}
-					}
-					else if (falling && hair)
-					{
-						tempFigure--;
-						if (!map[size - (tempFigure2)][tempFigure - 1].getNull())
-						{
-							map[size - (tempFigure2)][tempFigure - 1].setValue('q', map[size - (tempFigure2)][tempFigure - 1].getColor());
-							map[size - (tempFigure2)][tempFigure].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
-						}
-						else
-						{
-							std::cout << "Impossible move" << std::endl;
-							Sleep(3000);
-							break;
-						}
-					}
-					else if (!falling && hair)
-					{
-						tempFigure++;
-						if (!map[size - (tempFigure2)][tempFigure - 1].getNull())
-						{
-							map[size - (tempFigure2)][tempFigure - 1].setValue('q', map[size - (tempFigure2)][tempFigure - 1].getColor());
-							map[size - (tempFigure2)][tempFigure - 2].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
-						}
-						else
-						{
-							std::cout << "Impossible move" << std::endl;
-							Sleep(3000);
-							break;
-						}
-					}
-				}
-
-			}
-			else
-			{
-				int temppf2 = tempFigure2;
-				int temppf = tempFigure;
-				if (tempFigure < tempFinalPoint && tempFigure2 < tempFinalPoint2)
-				{
-					do {
-						temppf++;
-						temppf2++;
-						if (map[size - (temppf2)][temppf - 1].getNull())
-						{
-							std::cout << "Impossible move" << std::endl;
-							Sleep(1000);
-							break;
-						}
-						if (temppf == tempFinalPoint && temppf2 == tempFinalPoint2)
-						{
-							map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('q', map[size - (tempFigure2)][tempFigure - 1].getColor());
-							map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
-							break;
-						}
-						if (temppf > tempFinalPoint && temppf2 > tempFinalPoint2)
-						{
-							std::cout << "No Quenn!!" << std::endl;
-							Sleep(2000);
-							break;
-						}
-
-					} while (true);
-				}
-				else if (tempFigure < tempFinalPoint && tempFigure2 > tempFinalPoint2)
-				{
-					do {
-						temppf++;
-						temppf2--;
-						if (map[size - (temppf2)][temppf - 1].getNull())
-						{
-							std::cout << "Impossible move" << std::endl;
-							Sleep(1000);
-							break;
-						}
-						if (temppf == tempFinalPoint && temppf2 == tempFinalPoint2)
-						{
-							map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('q', map[size - (tempFigure2)][tempFigure - 1].getColor());
-							map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
-							break;
-						}
-						if (temppf > tempFinalPoint && temppf2 < tempFinalPoint2)
-						{
-							std::cout << "No Quenn!!" << std::endl;
-							Sleep(2000);
-							break;
-						}
-
-					} while (true);
-				}
-				else if (tempFigure > tempFinalPoint && tempFigure2 < tempFinalPoint2)
-				{
-					do {
-						temppf--;
-						temppf2++;
-						if (map[size - (temppf2)][temppf - 1].getNull())
-						{
-							std::cout << "Impossible move" << std::endl;
-							Sleep(1000);
-							break;
-						}
-						if (temppf == tempFinalPoint && temppf2 == tempFinalPoint2)
-						{
-							map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('q', map[size - (tempFigure2)][tempFigure - 1].getColor());
-							map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
-							break;
-						}
-						if (temppf < tempFinalPoint && temppf2 > tempFinalPoint2)
-						{
-							std::cout << "No Quenn!!" << std::endl;
-							Sleep(2000);
-							break;
-						}
-
-					} while (true);
-				}
-				else if (tempFigure > tempFinalPoint && tempFigure2 > tempFinalPoint2)
-				{
-					do {
-						temppf--;
-						temppf2--;
-						if (map[size - (temppf2)][temppf - 1].getNull())
-						{
-							std::cout << "Impossible move" << std::endl;
-							Sleep(1000);
-							break;
-						}
-						if (temppf == tempFinalPoint && temppf2 == tempFinalPoint2)
-						{
-							map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('q', map[size - (tempFigure2)][tempFigure - 1].getColor());
-							map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
-							break;
-						}
-						if (temppf < tempFinalPoint && temppf2 < tempFinalPoint2)
-						{
-							std::cout << "No Quenn!!" << std::endl;
-							Sleep(2000);
-							break;
-						}
-
-					} while (true);
-				}
-			
-			}
+			quennStep(tempFigure, tempFinalPoint, map, size, tempFigure2, tempFinalPoint2);
 		}
 
 
