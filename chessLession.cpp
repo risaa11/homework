@@ -136,18 +136,18 @@ public:
 
 	const char* getValue()
 	{
-		if (this->whiteColor)
+		if (!this->whiteColor)
 		{
 			if (E)
 				return u8"♗";
 			else if (Q)
-				return u8"♕";
+				return u8"♕"; 
 			else if (H)
 				return u8"♘";
 			else if (R)
 				return u8"♖";
 			else if (P)
-				return u8"♟";
+				return u8"♙";
 			else if (K)
 				return u8"♔";
 			else if (!E && !Q && !H && !R && !P && !K)
@@ -861,15 +861,11 @@ int main()
 	firstFillingMap(map, size);
 	do
 	{
-		if (map[0][3].getValue() == u8"♚" && map[7][3].getValue() == u8"♔")
-		{
+		if(map[0][3].getValue() == u8"♔" || map[7][3].getValue() == u8"♚")
 			printMap(map, size);
 			newStep(map, size);
 
 			system("cls");
-		}
-		else
-			(map[0][3].getValue() == u8"♚") ? std::cout << "Game over, black wins" : std::cout << "Game over, white wins"; break;
 	} while (true);
 }
 
