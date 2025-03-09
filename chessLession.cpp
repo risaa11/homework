@@ -1057,7 +1057,7 @@ bool checkAbilityStep(int stepFromX, int stepFromY, Figure** map, bool botMode)
 {
 	if(!botMode)
 	{
-		if ((map[stepFromX][stepFromY].getColor() == 'B' && player.getColorCurrentStep()) || (map[stepFromX][stepFromY].getColor() == 'W' && !player.getColorCurrentStep()))
+		if ((map[stepFromX][stepFromY].getColor() == 'B' && !player.getColorCurrentStep()) || (map[stepFromX][stepFromY].getColor() == 'W' && player.getColorCurrentStep()))
 		{
 			player.changeColorStep();
 			return true;
@@ -1071,7 +1071,7 @@ bool checkAbilityStep(int stepFromX, int stepFromY, Figure** map, bool botMode)
 	}
 	else
 	{
-		if ((map[stepFromX][stepFromY].getColor() == 'B' && player.getColorCurrentStep()) || (map[stepFromX][stepFromY].getColor() == 'W' && !player.getColorCurrentStep()))
+		if ((map[stepFromX][stepFromY].getColor() == 'B' && !player.getColorCurrentStep()) || (map[stepFromX][stepFromY].getColor() == 'W' && player.getColorCurrentStep()))
 			return true;
 		else
 			return false;
@@ -1135,38 +1135,25 @@ void botTurn(Figure** map, int size)
 	int toY = 0;
 	bool close = false;
 	do {
-		fromX = rand() % 7;
-		fromY = rand() % 7;
-		if (map[fromX][fromY].getNull())
+		fromX = rand() % 8 + 1;
+		fromY = rand() % 8 + 1;
+		for (int i = 0; i < 64; ++i)
 		{
-			if (checkAbilityStep(fromX, fromY, map, true))
+			toX = rand() % 8 + 1;
+			toY = rand() % 8 + 1;
+			if (newStep(map, size, fromY, fromX, toY, toX, true))
 			{
-				std::cout << "SO GOOD" << std::endl;
-				for (int i = 0; i < 64; ++i)
-				{
-					toX = rand() % 7;
-					toY = rand() % 7;
-					if (map[toX][toY].getNull())
-					{
-						if (newStep(map, size, fromY + 1, fromX + 1, toY + 1, toX + 1, true))
-						{
-							std::cout << "SO NIIIIICE" << std::endl;
-							Sleep(3000);
-							close = true;
-							break;
-						}
-					}
-				}
-				if (close)
-					break;
+				std::cout << "SO NIIIIICE" << std::endl;
+				player.changeColorStep();
+				Sleep(1000);
+				close = true;
+				break;
 			}
-			else
-			{
-				std::cout << "SO BAD" << std::endl;
-			}
-
-
 		}
+		if (close)
+			break;
+
+
 	} while (true);
 }
 
@@ -1196,7 +1183,10 @@ bool newStep(Figure** map, int size, int tempFigure, int tempFigure2, int tempFi
 	bool checkEnemy = false;
 
 	(map[size - (tempFigure2)][tempFigure - 1].getColor() == map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor()) ? checkEnemy = false : checkEnemy = true;
-	(checkAbilityStep(tempFigure2, tempFigure, map, botMode)) ? closeFunc = true : closeFunc = false;
+	if(botMode)
+		(checkAbilityStep(size - (tempFigure2), tempFigure - 1, map, botMode)) ? closeFunc = true : closeFunc = false;
+	else
+		(checkAbilityStep(size - (tempFigure2), tempFigure - 1, map, botMode)) ? closeFunc = true : closeFunc = false;
 	if (closeFunc)
 	{
 		if (map[size - (tempFigure2)][tempFigure - 1].getNull() && ((!map[size - (tempFinalPoint2)][tempFinalPoint - 1].getNull() || checkEnemy)))
