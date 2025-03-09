@@ -91,10 +91,9 @@ public:
 class Figure : public Quenn
 {
 protected:
-	bool line = true;
-	bool straight = false;
-	bool zigzag = false;
 	bool whiteColor = false;
+	bool whiteKingUnshakable = true;
+	bool blackKingUnshakable = true;
 public:
 	Figure(char s)
 	{
@@ -109,7 +108,6 @@ public:
 		if (s == 'h')
 		{
 			this->H = true;
-			this->zigzag = true;
 		}
 		if (s == 'p')
 		{
@@ -132,6 +130,27 @@ public:
 		this->P = false;
 		this->R = false;
 		this->E = false;
+		this->whiteKingUnshakable = true;
+		this->blackKingUnshakable = true;
+	}
+
+	void changeWhiteKing()
+	{
+		this->whiteKingUnshakable = false;
+	}
+
+	void changeBlackKing()
+	{
+		this->blackKingUnshakable = false;
+	}
+
+	bool whiteKingUnshakableCheck()
+	{
+		return this->whiteKingUnshakable;
+	}
+	bool blackKingUnshakableCheck()
+	{
+		return this->blackKingUnshakable;
 	}
 
 	const char* getValue()
@@ -149,7 +168,7 @@ public:
 			else if (P)
 				return u8"♟";
 			else if (K)
-				return u8"♔";
+				return u8"♔"; 
 			else if (!E && !Q && !H && !R && !P && !K)
 				return 0;
 		}
@@ -196,20 +215,16 @@ public:
 			if (s == 'h')
 			{
 				this->H = true;
-				this->line = false;
-				this->zigzag = true;
 				this->whiteColor = true;
 			}
 			if (s == 'p')
 			{
 				this->P = true;
-				this->straight = true;
 				this->whiteColor = true;
 			}
 			if (s == 'r')
 			{
 				this->R = true;
-				this->straight = true;
 				this->whiteColor = true;
 			}
 			if (s == 'e')
@@ -239,20 +254,16 @@ public:
 			if (s == 'h')
 			{
 				this->H = true;
-				this->line = false;
-				this->zigzag = true;
 				this->whiteColor = false;
 			}
 			if (s == 'p')
 			{
 				this->P = true;
-				this->straight = true;
 				this->whiteColor = false;
 			}
 			if (s == 'r')
 			{
 				this->R = true;
-				this->straight = true;
 				this->whiteColor = false;
 			}
 			if (s == 'e')
@@ -263,16 +274,13 @@ public:
 		}
 	}
 
-	
+
 
 	int getNull()
 	{
 		return (this->K == false && this->Q == false && this->H == false && this->P == false && this->R == false && this->E == false) ? 0 : 1;
 	}
-	bool getZigZag()
-	{
-		return this->zigzag;
-	}
+	
 	char getColor()
 	{
 		return (whiteColor) ? 'W' : 'B';
@@ -327,6 +335,7 @@ void printMap(Figure** map, int size)
 	int scrr = size;
 	for (int i = 0; i < size; ++i)
 	{
+		std::cout << scrr << "   ";
 		for (int j = 0; j < size; ++j)
 		{
 			if (map[i][j].getValue() != 0)
@@ -337,7 +346,9 @@ void printMap(Figure** map, int size)
 		std::cout << "   " << scrr << std::endl;
 		scrr--;
 	}
-	std::cout << "\n\nA" << ' ' << "B" << ' ' << "C" << ' ' << "D" << ' ' << "E" << ' ' << "F" << ' ' << "G" << ' ' << "H" << ' ' << "           <<<<<<<<<<<<<------------" << std::endl;
+	std::cout << "\n\n    A" << ' ' << "B" << ' ' << "C" << ' ' << "D" << ' ' << "E" << ' ' << "F" << ' ' << "G" << ' ' << "H" << ' ' << "           <<<<<<<<<<<<<------------\n" << std::endl;
+	(player.getPlayerTurn()) ? std::cout << "Player turn" << std::endl : std::cout << "BOT turn" << std::endl;
+	(player.getColorCurrentStep()) ? std::cout << "White player choose\n" << std::endl : std::cout << "Black player choose\n" << std::endl;
 }
 
 void firstFillingMap(Figure** array, int size)
@@ -372,135 +383,20 @@ bool quennStep(int tempFigure, int tempFinalPoint, Figure** map, int size, int t
 {
 	if (((tempFigure - tempFinalPoint) == 0 || (tempFigure2 - tempFinalPoint2) == 0) || ((tempFigure + tempFinalPoint) == 0 || (tempFigure2 + tempFinalPoint2) == 0) || ((tempFigure + tempFinalPoint) == 0 || (tempFigure2 - tempFinalPoint2) == 0) || ((tempFigure - tempFinalPoint) == 0 || (tempFigure2 + tempFinalPoint2) == 0))
 	{
-		int tempp = 0;
-		bool hair = true, falling = false;
-		if (tempFigure2 - tempFinalPoint2 != 0)
-			hair = false;
-		if (hair)
-		{
-			if (tempFigure > tempFinalPoint)
-			{
-				falling = true;
-				tempp = tempFigure - tempFinalPoint;
-			}
-			else
-			{
-				falling = false;
-				tempp = tempFinalPoint - tempFigure;
-			}
-		}
-		else
-		{
-			if (tempFigure2 > tempFinalPoint2)
-			{
-				falling = true;
-				tempp = tempFigure2 - tempFinalPoint2;
-			}
-			else
-			{
-				falling = false;
-				tempp = tempFinalPoint2 - tempFigure2;
-			}
-		}
-		for (int i = 0;i < tempp; ++i)
-		{
-			if (falling && !hair)
-			{
-				tempFigure2--;
-				if (!map[size - (tempFigure2)][tempFigure - 1].getNull())
-				{
-					map[size - (tempFigure2)][tempFigure - 1].setValue('q', map[size - (tempFigure2)][tempFigure - 1].getColor());
-					map[size - (tempFigure2 + 1)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
-					player.changePlayerTurn();
-					return true;
-					
-				}
-				else
-				{
-					if (botMode)
-					{
-						std::cout << "Impossible move" << std::endl;
-						Sleep(1000);
-					}
-					return false;
-					break;
-				}
-			}
-			else if (!falling && !hair)
-			{
-				tempFigure2++;
-				if (!map[size - (tempFigure2)][tempFigure - 1].getNull())
-				{
-					map[size - (tempFigure2)][tempFigure - 1].setValue('q', map[size - (tempFigure2)][tempFigure - 1].getColor());
-					map[size - (tempFigure2 - 1)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
-					player.changePlayerTurn();
-					return true;
-				}
-				else
-				{
-					if (botMode)
-					{
-						std::cout << "Impossible move" << std::endl;
-						Sleep(1000);
-					}
-					return false;
-					break;
-				}
-			}
-			else if (falling && hair)
-			{
-				tempFigure--;
-				if (!map[size - (tempFigure2)][tempFigure - 1].getNull())
-				{
-					map[size - (tempFigure2)][tempFigure - 1].setValue('q', map[size - (tempFigure2)][tempFigure - 1].getColor());
-					map[size - (tempFigure2)][tempFigure].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
-					player.changePlayerTurn();
-					return true;
-				}
-				else
-				{
-					if (botMode)
-					{
-						std::cout << "Impossible move" << std::endl;
-						Sleep(1000);
-					}
-					return false;
-					break;
-				}
-			}
-			else if (!falling && hair)
-			{
-				tempFigure++;
-				if (!map[size - (tempFigure2)][tempFigure - 1].getNull())
-				{
-					map[size - (tempFigure2)][tempFigure - 1].setValue('q', map[size - (tempFigure2)][tempFigure - 1].getColor());
-					map[size - (tempFigure2)][tempFigure - 2].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
-					player.changePlayerTurn();
-					return true;
-				}
-				else
-				{
-					if (botMode)
-					{
-						std::cout << "Impossible move" << std::endl;
-						Sleep(1000);
-					}
-					return false;
-					break;
-				}
-			}
-		}
-
-	}
-	else
-	{
 		int temppf2 = tempFigure2;
 		int temppf = tempFigure;
-		if (tempFigure < tempFinalPoint && tempFigure2 < tempFinalPoint2)
+		if (tempFigure2 < tempFinalPoint2)
 		{
 			do {
-				temppf++;
 				temppf2++;
+				if (map[size - (temppf2)][temppf - 1].getNull() && (map[size - (temppf2)][temppf - 1].getColor() != map[size - (tempFigure2)][tempFigure - 1].getColor()))
+				{
+					map[size - (temppf2)][temppf - 1].setValue('q', map[size - (tempFigure2)][tempFigure - 1].getColor());
+					map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
+					player.changePlayerTurn();
+					player.changeColorStep();
+					return true;
+				}
 				if (map[size - (temppf2)][temppf - 1].getNull())
 				{
 					if (botMode)
@@ -516,6 +412,7 @@ bool quennStep(int tempFigure, int tempFinalPoint, Figure** map, int size, int t
 					map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('q', map[size - (tempFigure2)][tempFigure - 1].getColor());
 					map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
 					player.changePlayerTurn();
+					player.changeColorStep();
 					return true;
 					break;
 				}
@@ -523,8 +420,190 @@ bool quennStep(int tempFigure, int tempFinalPoint, Figure** map, int size, int t
 				{
 					if (botMode)
 					{
+						std::cout << "No quenn!!" << std::endl;
+						Sleep(2000);
+					}
+					return false;
+					break;
+				}
+
+			} while (true);
+		}
+		else if (tempFigure2 > tempFinalPoint2)
+		{
+			do {
+				temppf2--;
+				if (map[size - (temppf2)][temppf - 1].getNull() && (map[size - (temppf2)][temppf - 1].getColor() != map[size - (tempFigure2)][tempFigure - 1].getColor()))
+				{
+					map[size - (temppf2)][temppf - 1].setValue('q', map[size - (tempFigure2)][tempFigure - 1].getColor());
+					map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
+					player.changePlayerTurn();
+					player.changeColorStep();
+					return true;
+				}
+				if (map[size - (temppf2)][temppf - 1].getNull())
+				{
+					if (botMode)
+					{
 						std::cout << "Impossible move" << std::endl;
 						Sleep(1000);
+					}
+					return false;
+					break;
+				}
+				if (temppf == tempFinalPoint && temppf2 == tempFinalPoint2)
+				{
+					map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('q', map[size - (tempFigure2)][tempFigure - 1].getColor());
+					map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
+					player.changePlayerTurn();
+					player.changeColorStep();
+					return true;
+					break;
+				}
+				if (temppf > tempFinalPoint && temppf2 < tempFinalPoint2)
+				{
+					if (botMode)
+					{
+						std::cout << "No quenn!!" << std::endl;
+						Sleep(2000);
+					}
+					return false;
+					break;
+				}
+
+			} while (true);
+		}
+		else if (tempFigure > tempFinalPoint)
+		{
+			do {
+				temppf--;
+				if (map[size - (temppf2)][temppf - 1].getNull() && (map[size - (temppf2)][temppf - 1].getColor() != map[size - (tempFigure2)][tempFigure - 1].getColor()))
+				{
+					map[size - (temppf2)][temppf - 1].setValue('q', map[size - (tempFigure2)][tempFigure - 1].getColor());
+					map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
+					player.changePlayerTurn();
+					player.changeColorStep();
+					return true;
+				}
+				if (map[size - (temppf2)][temppf - 1].getNull())
+				{
+					if (botMode)
+					{
+						std::cout << "Impossible move" << std::endl;
+						Sleep(1000);
+					}
+					return false;
+					break;
+				}
+				if (temppf == tempFinalPoint && temppf2 == tempFinalPoint2)
+				{
+					map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('q', map[size - (tempFigure2)][tempFigure - 1].getColor());
+					map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
+					player.changePlayerTurn();
+					player.changeColorStep();
+					return true;
+					break;
+				}
+				if (temppf < tempFinalPoint && temppf2 > tempFinalPoint2)
+				{
+					if (botMode)
+					{
+						std::cout << "No quenn!!" << std::endl;
+						Sleep(2000);
+					}
+					return false;
+					break;
+				}
+
+			} while (true);
+		}
+		else if (tempFigure < tempFinalPoint)
+		{
+			do {
+				temppf++;
+				if (map[size - (temppf2)][temppf - 1].getNull() && (map[size - (temppf2)][temppf - 1].getColor() != map[size - (tempFigure2)][tempFigure - 1].getColor()))
+				{
+					map[size - (temppf2)][temppf - 1].setValue('q', map[size - (tempFigure2)][tempFigure - 1].getColor());
+					map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
+					player.changePlayerTurn();
+					player.changeColorStep();
+					return true;
+				}
+				if (map[size - (temppf2)][temppf - 1].getNull())
+				{
+					if (botMode)
+					{
+						std::cout << "Impossible move" << std::endl;
+						Sleep(1000);
+					}
+					return false;
+					break;
+				}
+				if (temppf == tempFinalPoint && temppf2 == tempFinalPoint2)
+				{
+					map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('q', map[size - (tempFigure2)][tempFigure - 1].getColor());
+					map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
+					player.changePlayerTurn();
+					player.changeColorStep();
+					return true;
+					break;
+				}
+				if (temppf < tempFinalPoint && temppf2 < tempFinalPoint2)
+				{
+					if (botMode)
+					{
+						std::cout << "No quenn!!" << std::endl;
+						Sleep(2000);
+					}
+					return false;
+					break;
+				}
+
+			} while (true);
+		}
+	}
+	else
+	{
+		int temppf2 = tempFigure2;
+		int temppf = tempFigure;
+		if (tempFigure < tempFinalPoint && tempFigure2 < tempFinalPoint2)
+		{
+			do {
+				temppf++;
+				temppf2++;
+				if (map[size - (temppf2)][temppf - 1].getNull() && (map[size - (temppf2)][temppf - 1].getColor() != map[size - (tempFigure2)][tempFigure - 1].getColor()))
+				{
+					map[size - (temppf2)][temppf - 1].setValue('q', map[size - (tempFigure2)][tempFigure - 1].getColor());
+					map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
+					player.changePlayerTurn();
+					player.changeColorStep();
+					return true;
+				}
+				if (map[size - (temppf2)][temppf - 1].getNull())
+				{
+					if (botMode)
+					{
+						std::cout << "Impossible move" << std::endl;
+						Sleep(1000);
+					}
+					return false;
+					break;
+				}
+				if (temppf == tempFinalPoint && temppf2 == tempFinalPoint2)
+				{
+					map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('q', map[size - (tempFigure2)][tempFigure - 1].getColor());
+					map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
+					player.changePlayerTurn();
+					player.changeColorStep();
+					return true;
+					break;
+				}
+				if (temppf > tempFinalPoint && temppf2 > tempFinalPoint2)
+				{
+					if (botMode)
+					{
+						std::cout << "No queen!!" << std::endl;
+						Sleep(2000);
 					}
 					return false;
 					break;
@@ -537,6 +616,14 @@ bool quennStep(int tempFigure, int tempFinalPoint, Figure** map, int size, int t
 			do {
 				temppf++;
 				temppf2--;
+				if (map[size - (temppf2)][temppf - 1].getNull() && (map[size - (temppf2)][temppf - 1].getColor() != map[size - (tempFigure2)][tempFigure - 1].getColor()))
+				{
+					map[size - (temppf2)][temppf - 1].setValue('q', map[size - (tempFigure2)][tempFigure - 1].getColor());
+					map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
+					player.changePlayerTurn();
+					player.changeColorStep();
+					return true;
+				}
 				if (map[size - (temppf2)][temppf - 1].getNull())
 				{
 					if (botMode)
@@ -552,6 +639,7 @@ bool quennStep(int tempFigure, int tempFinalPoint, Figure** map, int size, int t
 					map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('q', map[size - (tempFigure2)][tempFigure - 1].getColor());
 					map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
 					player.changePlayerTurn();
+					player.changeColorStep();
 					return true;
 					break;
 				}
@@ -559,8 +647,8 @@ bool quennStep(int tempFigure, int tempFinalPoint, Figure** map, int size, int t
 				{
 					if (botMode)
 					{
-						std::cout << "Impossible move" << std::endl;
-						Sleep(1000);
+						std::cout << "No queen!!" << std::endl;
+						Sleep(2000);
 					}
 					return false;
 					break;
@@ -573,6 +661,14 @@ bool quennStep(int tempFigure, int tempFinalPoint, Figure** map, int size, int t
 			do {
 				temppf--;
 				temppf2++;
+				if (map[size - (temppf2)][temppf - 1].getNull() && (map[size - (temppf2)][temppf - 1].getColor() != map[size - (tempFigure2)][tempFigure - 1].getColor()))
+				{
+					map[size - (temppf2)][temppf - 1].setValue('q', map[size - (tempFigure2)][tempFigure - 1].getColor());
+					map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
+					player.changePlayerTurn();
+					player.changeColorStep();
+					return true;
+				}
 				if (map[size - (temppf2)][temppf - 1].getNull())
 				{
 					if (botMode)
@@ -588,6 +684,7 @@ bool quennStep(int tempFigure, int tempFinalPoint, Figure** map, int size, int t
 					map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('q', map[size - (tempFigure2)][tempFigure - 1].getColor());
 					map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
 					player.changePlayerTurn();
+					player.changeColorStep();
 					return true;
 					break;
 				}
@@ -595,8 +692,8 @@ bool quennStep(int tempFigure, int tempFinalPoint, Figure** map, int size, int t
 				{
 					if (botMode)
 					{
-						std::cout << "Impossible move" << std::endl;
-						Sleep(1000);
+						std::cout << "No queen!!" << std::endl;
+						Sleep(2000);
 					}
 					return false;
 					break;
@@ -609,6 +706,14 @@ bool quennStep(int tempFigure, int tempFinalPoint, Figure** map, int size, int t
 			do {
 				temppf--;
 				temppf2--;
+				if (map[size - (temppf2)][temppf - 1].getNull() && (map[size - (temppf2)][temppf - 1].getColor() != map[size - (tempFigure2)][tempFigure - 1].getColor()))
+				{
+					map[size - (temppf2)][temppf - 1].setValue('q', map[size - (tempFigure2)][tempFigure - 1].getColor());
+					map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
+					player.changePlayerTurn();
+					player.changeColorStep();
+					return true;
+				}
 				if (map[size - (temppf2)][temppf - 1].getNull())
 				{
 					if (botMode)
@@ -624,6 +729,7 @@ bool quennStep(int tempFigure, int tempFinalPoint, Figure** map, int size, int t
 					map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('q', map[size - (tempFigure2)][tempFigure - 1].getColor());
 					map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
 					player.changePlayerTurn();
+					player.changeColorStep();
 					return true;
 					break;
 				}
@@ -631,8 +737,8 @@ bool quennStep(int tempFigure, int tempFinalPoint, Figure** map, int size, int t
 				{
 					if (botMode)
 					{
-						std::cout << "Impossible move" << std::endl;
-						Sleep(1000);
+						std::cout << "No queen!!" << std::endl;
+						Sleep(2000);
 					}
 					return false;
 					break;
@@ -640,7 +746,6 @@ bool quennStep(int tempFigure, int tempFinalPoint, Figure** map, int size, int t
 
 			} while (true);
 		}
-
 	}
 }
 
@@ -650,13 +755,14 @@ bool pStep(int tempFigure, int tempFinalPoint, Figure** map, int size, int tempF
 	{
 		if (!map[size - (tempFinalPoint2)][tempFinalPoint - 1].getNull())
 		{
-			if (tempFigure2 - tempFinalPoint2 == 1 || tempFigure2 - tempFinalPoint2 == -1)
+			if ((tempFigure2 - tempFinalPoint2 == 1 || tempFigure2 - tempFinalPoint2 == -1) && (tempFigure - tempFinalPoint == 0))
 			{
 				if (size - (tempFinalPoint2) < size - (tempFigure2))
 				{
 					map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('p', map[size - (tempFigure2)][tempFigure - 1].getColor());
 					map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
 					player.changePlayerTurn();
+					player.changeColorStep();
 					return true;
 				}
 				else
@@ -681,11 +787,12 @@ bool pStep(int tempFigure, int tempFinalPoint, Figure** map, int size, int tempF
 		}
 		else
 		{
-			if (tempFinalPoint2 - tempFigure2 == 1 && tempFigure != tempFinalPoint && (tempFinalPoint - tempFigure == 1 || tempFinalPoint - tempFigure == -1))
+			if ((tempFinalPoint2 - tempFigure2 == 1 && tempFigure != tempFinalPoint) && (tempFinalPoint - tempFigure == 1 || tempFinalPoint - tempFigure == -1))
 			{
 				map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('p', map[size - (tempFigure2)][tempFigure - 1].getColor());
 				map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
 				player.changePlayerTurn();
+				player.changeColorStep();
 				return true;
 			}
 			else
@@ -703,13 +810,14 @@ bool pStep(int tempFigure, int tempFinalPoint, Figure** map, int size, int tempF
 	{
 		if (!map[size - (tempFinalPoint2)][tempFinalPoint - 1].getNull())
 		{
-			if (tempFigure2 - tempFinalPoint2 == 1 || tempFigure2 - tempFinalPoint2 == -1)
+			if ((tempFigure2 - tempFinalPoint2 == 1 || tempFigure2 - tempFinalPoint2 == -1) && (tempFigure - tempFinalPoint == 0))
 			{
 				if (size - (tempFinalPoint2) > size - (tempFigure2))
 				{
 					map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('p', map[size - (tempFigure2)][tempFigure - 1].getColor());
 					map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
 					player.changePlayerTurn();
+					player.changeColorStep();
 					return true;
 				}
 				else
@@ -734,11 +842,12 @@ bool pStep(int tempFigure, int tempFinalPoint, Figure** map, int size, int tempF
 		}
 		else
 		{
-			if (tempFinalPoint2 - tempFigure2 == -1 && tempFigure != tempFinalPoint && (tempFinalPoint - tempFigure == 1 || tempFinalPoint - tempFigure == -1))
+			if ((tempFinalPoint2 - tempFigure2 == -1 && tempFigure != tempFinalPoint) && (tempFinalPoint - tempFigure == 1 || tempFinalPoint - tempFigure == -1))
 			{
 				map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('p', map[size - (tempFigure2)][tempFigure - 1].getColor());
 				map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
 				player.changePlayerTurn();
+				player.changeColorStep();
 				return true;
 			}
 			else
@@ -756,57 +865,130 @@ bool pStep(int tempFigure, int tempFinalPoint, Figure** map, int size, int tempF
 
 bool kStep(int tempFigure, int tempFinalPoint, Figure** map, int size, int tempFigure2, int tempFinalPoint2, bool botMode)
 {
-	map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('k', map[size - (tempFigure2)][tempFigure - 1].getColor());
-	map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
-	player.changePlayerTurn();
-	return true;
+	if (map[size - (tempFigure2)][tempFigure - 1].getColor() == 'B')
+		map[size - (tempFigure2)][tempFigure - 1].changeBlackKing();
+	else
+	{
+		map[size - (tempFigure2)][tempFigure - 1].changeWhiteKing();
+	}
+	
+	if (((tempFigure2 - tempFinalPoint2 == 1 || tempFigure2 - tempFinalPoint2 == -1) && tempFigure - tempFinalPoint == 0) || ((tempFigure - tempFinalPoint == 1 || tempFigure - tempFinalPoint == -1) && tempFigure2 - tempFinalPoint2 == 0) || ((tempFigure2 - tempFinalPoint2 == 1 || tempFigure2 - tempFinalPoint2 == -1) && ((tempFigure - tempFinalPoint == 1 || tempFigure - tempFinalPoint == -1))))
+	{
+		map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('k', map[size - (tempFigure2)][tempFigure - 1].getColor());
+		map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
+		player.changePlayerTurn();
+		player.changeColorStep();
+		return true;
+	}
+	else 
+		return false;
 }
 
 bool rStep(int tempFigure, int tempFinalPoint, Figure** map, int size, int tempFigure2, int tempFinalPoint2, bool botMode)
 {
-	int tempp = 0;
-	bool hair = true, falling = false;
-	if (tempFigure2 - tempFinalPoint2 != 0)
-		hair = false;
-	if (hair)
+	int temppf2 = tempFigure2;
+	int temppf = tempFigure;
+	if (tempFigure2 < tempFinalPoint2)
 	{
-		if (tempFigure > tempFinalPoint)
-		{
-			falling = true;
-			tempp = tempFigure - tempFinalPoint;
-		}
-		else
-		{
-			falling = false;
-			tempp = tempFinalPoint - tempFigure;
-		}
+		do {
+			temppf2++;
+			if (map[size - (temppf2)][temppf - 1].getNull() && (map[size - (temppf2)][temppf - 1].getColor() != map[size - (tempFigure2)][tempFigure - 1].getColor()))
+			{
+				map[size - (temppf2)][temppf - 1].setValue('r', map[size - (tempFigure2)][tempFigure - 1].getColor());
+				map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
+				player.changePlayerTurn();
+				player.changeColorStep();
+				return true;
+			}
+			if (map[size - (temppf2)][temppf - 1].getNull())
+			{
+				if (botMode)
+				{
+					std::cout << "Impossible move" << std::endl;
+					Sleep(1000);
+				}
+				return false;
+				break;
+			}
+			if (temppf == tempFinalPoint && temppf2 == tempFinalPoint2)
+			{
+				map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('r', map[size - (tempFigure2)][tempFigure - 1].getColor());
+				map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
+				player.changePlayerTurn();
+				player.changeColorStep();
+				return true;
+				break;
+			}
+			if (temppf > tempFinalPoint && temppf2 > tempFinalPoint2)
+			{
+				if (botMode)
+				{
+					std::cout << "No rogue!!" << std::endl;
+					Sleep(2000);
+				}
+				return false;
+				break;
+			}
+
+		} while (true);
 	}
-	else
+	else if (tempFigure2 > tempFinalPoint2)
 	{
-		if (tempFigure2 > tempFinalPoint2)
-		{
-			falling = true;
-			tempp = tempFigure2 - tempFinalPoint2;
-		}
-		else
-		{
-			falling = false;
-			tempp = tempFinalPoint2 - tempFigure2;
-		}
+		do {
+			temppf2--;
+			if (map[size - (temppf2)][temppf - 1].getNull() && (map[size - (temppf2)][temppf - 1].getColor() != map[size - (tempFigure2)][tempFigure - 1].getColor()))
+			{
+				map[size - (temppf2)][temppf - 1].setValue('r', map[size - (tempFigure2)][tempFigure - 1].getColor());
+				map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
+				player.changePlayerTurn();
+				player.changeColorStep();
+				return true;
+			}
+			if (map[size - (temppf2)][temppf - 1].getNull())
+			{
+				if (botMode)
+				{
+					std::cout << "Impossible move" << std::endl;
+					Sleep(1000);
+				}
+				return false;
+				break;
+			}
+			if (temppf == tempFinalPoint && temppf2 == tempFinalPoint2)
+			{
+				map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('r', map[size - (tempFigure2)][tempFigure - 1].getColor());
+				map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
+				player.changePlayerTurn();
+				player.changeColorStep();
+				return true;
+				break;
+			}
+			if (temppf > tempFinalPoint && temppf2 < tempFinalPoint2)
+			{
+				if (botMode)
+				{
+					std::cout << "No rogue!!" << std::endl;
+					Sleep(2000);
+				}
+				return false;
+				break;
+			}
+
+		} while (true);
 	}
-	for (int i = 0;i < tempp; ++i)
+	else if (tempFigure > tempFinalPoint)
 	{
-		if (falling && !hair)
-		{
-			tempFigure2--;
-			if (!map[size - (tempFigure2)][tempFigure - 1].getNull())
+		do {
+			temppf--;
+			if (map[size - (temppf2)][temppf - 1].getNull() && (map[size - (temppf2)][temppf - 1].getColor() != map[size - (tempFigure2)][tempFigure - 1].getColor()))
 			{
-				map[size - (tempFigure2)][tempFigure - 1].setValue('r', map[size - (tempFigure2)][tempFigure - 1].getColor());
-				map[size - (tempFigure2 + 1)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
+				map[size - (temppf2)][temppf - 1].setValue('r', map[size - (tempFigure2)][tempFigure - 1].getColor());
+				map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
 				player.changePlayerTurn();
+				player.changeColorStep();
 				return true;
 			}
-			else
+			if (map[size - (temppf2)][temppf - 1].getNull())
 			{
 				if (botMode)
 				{
@@ -816,18 +998,41 @@ bool rStep(int tempFigure, int tempFinalPoint, Figure** map, int size, int tempF
 				return false;
 				break;
 			}
-		}
-		else if (!falling && !hair)
-		{
-			tempFigure2++;
-			if (!map[size - (tempFigure2)][tempFigure - 1].getNull())
+			if (temppf == tempFinalPoint && temppf2 == tempFinalPoint2)
 			{
-				map[size - (tempFigure2)][tempFigure - 1].setValue('r', map[size - (tempFigure2)][tempFigure - 1].getColor());
-				map[size - (tempFigure2 - 1)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
+				map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('r', map[size - (tempFigure2)][tempFigure - 1].getColor());
+				map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
 				player.changePlayerTurn();
+				player.changeColorStep();
+				return true;
+				break;
+			}
+			if (temppf < tempFinalPoint && temppf2 > tempFinalPoint2)
+			{
+				if (botMode)
+				{
+					std::cout << "No rogue!!" << std::endl;
+					Sleep(2000);
+				}
+				return false;
+				break;
+			}
+
+		} while (true);
+	}
+	else if (tempFigure < tempFinalPoint)
+	{
+		do {
+			temppf++;
+			if (map[size - (temppf2)][temppf - 1].getNull() && (map[size - (temppf2)][temppf - 1].getColor() != map[size - (tempFigure2)][tempFigure - 1].getColor()))
+			{
+				map[size - (temppf2)][temppf - 1].setValue('r', map[size - (tempFigure2)][tempFigure - 1].getColor());
+				map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
+				player.changePlayerTurn();
+				player.changeColorStep();
 				return true;
 			}
-			else
+			if (map[size - (temppf2)][temppf - 1].getNull())
 			{
 				if (botMode)
 				{
@@ -837,49 +1042,27 @@ bool rStep(int tempFigure, int tempFinalPoint, Figure** map, int size, int tempF
 				return false;
 				break;
 			}
-		}
-		else if (falling && hair)
-		{
-			tempFigure--;
-			if (!map[size - (tempFigure2)][tempFigure - 1].getNull())
+			if (temppf == tempFinalPoint && temppf2 == tempFinalPoint2)
 			{
-				map[size - (tempFigure2)][tempFigure - 1].setValue('r', map[size - (tempFigure2)][tempFigure - 1].getColor());
-				map[size - (tempFigure2)][tempFigure].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
+				map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('r', map[size - (tempFigure2)][tempFigure - 1].getColor());
+				map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
 				player.changePlayerTurn();
+				player.changeColorStep();
 				return true;
+				break;
 			}
-			else
+			if (temppf < tempFinalPoint && temppf2 < tempFinalPoint2)
 			{
 				if (botMode)
 				{
-					std::cout << "Impossible move" << std::endl;
-					Sleep(1000);
+					std::cout << "No rogue!!" << std::endl;
+					Sleep(2000);
 				}
 				return false;
 				break;
 			}
-		}
-		else if (!falling && hair)
-		{
-			tempFigure++;
-			if (!map[size - (tempFigure2)][tempFigure - 1].getNull())
-			{
-				map[size - (tempFigure2)][tempFigure - 1].setValue('r', map[size - (tempFigure2)][tempFigure - 1].getColor());
-				map[size - (tempFigure2)][tempFigure - 2].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
-				player.changePlayerTurn();
-				return true;
-			}
-			else
-			{
-				if (botMode)
-				{
-					std::cout << "Impossible move" << std::endl;
-					Sleep(1000);
-				}
-				return false;
-				break;
-			}
-		}
+
+		} while (true);
 	}
 }
 
@@ -892,6 +1075,14 @@ bool eStep(int tempFigure, int tempFinalPoint, Figure** map, int size, int tempF
 		do {
 			temppf++;
 			temppf2++;
+			if (map[size - (temppf2)][temppf - 1].getNull() && (map[size - (temppf2)][temppf - 1].getColor() != map[size - (tempFigure2)][tempFigure - 1].getColor()))
+			{
+				map[size - (temppf2)][temppf - 1].setValue('e', map[size - (tempFigure2)][tempFigure - 1].getColor());
+				map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
+				player.changePlayerTurn();
+				player.changeColorStep();
+				return true;
+			}
 			if (map[size - (temppf2)][temppf - 1].getNull())
 			{
 				if (botMode)
@@ -907,6 +1098,7 @@ bool eStep(int tempFigure, int tempFinalPoint, Figure** map, int size, int tempF
 				map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('e', map[size - (tempFigure2)][tempFigure - 1].getColor());
 				map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
 				player.changePlayerTurn();
+				player.changeColorStep();
 				return true;
 				break;
 			}
@@ -928,6 +1120,14 @@ bool eStep(int tempFigure, int tempFinalPoint, Figure** map, int size, int tempF
 		do {
 			temppf++;
 			temppf2--;
+			if (map[size - (temppf2)][temppf - 1].getNull() && (map[size - (temppf2)][temppf - 1].getColor() != map[size - (tempFigure2)][tempFigure - 1].getColor()))
+			{
+				map[size - (temppf2)][temppf - 1].setValue('e', map[size - (tempFigure2)][tempFigure - 1].getColor());
+				map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
+				player.changePlayerTurn();
+				player.changeColorStep();
+				return true;
+			}
 			if (map[size - (temppf2)][temppf - 1].getNull())
 			{
 				if (botMode)
@@ -943,6 +1143,7 @@ bool eStep(int tempFigure, int tempFinalPoint, Figure** map, int size, int tempF
 				map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('e', map[size - (tempFigure2)][tempFigure - 1].getColor());
 				map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
 				player.changePlayerTurn();
+				player.changeColorStep();
 				return true;
 				break;
 			}
@@ -964,6 +1165,14 @@ bool eStep(int tempFigure, int tempFinalPoint, Figure** map, int size, int tempF
 		do {
 			temppf--;
 			temppf2++;
+			if (map[size - (temppf2)][temppf - 1].getNull() && (map[size - (temppf2)][temppf - 1].getColor() != map[size - (tempFigure2)][tempFigure - 1].getColor()))
+			{
+				map[size - (temppf2)][temppf - 1].setValue('e', map[size - (tempFigure2)][tempFigure - 1].getColor());
+				map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
+				player.changePlayerTurn();
+				player.changeColorStep();
+				return true;
+			}
 			if (map[size - (temppf2)][temppf - 1].getNull())
 			{
 				if (botMode)
@@ -979,6 +1188,7 @@ bool eStep(int tempFigure, int tempFinalPoint, Figure** map, int size, int tempF
 				map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('e', map[size - (tempFigure2)][tempFigure - 1].getColor());
 				map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
 				player.changePlayerTurn();
+				player.changeColorStep();
 				return true;
 				break;
 			}
@@ -1000,6 +1210,14 @@ bool eStep(int tempFigure, int tempFinalPoint, Figure** map, int size, int tempF
 		do {
 			temppf--;
 			temppf2--;
+			if (map[size - (temppf2)][temppf - 1].getNull() && (map[size - (temppf2)][temppf - 1].getColor() != map[size - (tempFigure2)][tempFigure - 1].getColor()))
+			{
+				map[size - (temppf2)][temppf - 1].setValue('e', map[size - (tempFigure2)][tempFigure - 1].getColor());
+				map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
+				player.changePlayerTurn();
+				player.changeColorStep();
+				return true;
+			}
 			if (map[size - (temppf2)][temppf - 1].getNull())
 			{
 				if (botMode)
@@ -1015,6 +1233,7 @@ bool eStep(int tempFigure, int tempFinalPoint, Figure** map, int size, int tempF
 				map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('e', map[size - (tempFigure2)][tempFigure - 1].getColor());
 				map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
 				player.changePlayerTurn();
+				player.changeColorStep();
 				return true;
 				break;
 			}
@@ -1035,16 +1254,17 @@ bool eStep(int tempFigure, int tempFinalPoint, Figure** map, int size, int tempF
 
 bool hStep(int tempFigure, int tempFinalPoint, Figure** map, int size, int tempFigure2, int tempFinalPoint2, bool botMode)
 {
-	if (((tempFigure - tempFinalPoint == 1 || tempFigure - tempFinalPoint == -1) || (tempFigure - tempFinalPoint == 2 || tempFigure - tempFinalPoint == -2)) && ((tempFigure2 - tempFinalPoint2 == 1 || tempFigure2 - tempFinalPoint2 == -1) || (tempFigure2 - tempFinalPoint2 == 2 || tempFigure2 - tempFinalPoint2 == -2)))
+	if (((tempFigure - tempFinalPoint == 1 || tempFigure - tempFinalPoint == -1) && (tempFigure2 - tempFinalPoint2 == 2 || tempFigure2 - tempFinalPoint2 == -2)) || ((tempFigure - tempFinalPoint == 2 || tempFigure - tempFinalPoint == -2) && (tempFigure2 - tempFinalPoint2 == 1 || tempFigure2 - tempFinalPoint2 == -1)))
 	{
 		map[size - (tempFinalPoint2)][tempFinalPoint - 1].setValue('h', map[size - (tempFigure2)][tempFigure - 1].getColor());
 		map[size - (tempFigure2)][tempFigure - 1].setValue('n', map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor());
 		player.changePlayerTurn();
+		player.changeColorStep();
 		return true;
 	}
 	else
 	{
-		if(botMode)
+		if (botMode)
 		{
 			std::cout << "Impossible point!!" << std::endl;
 			Sleep(1000);
@@ -1055,22 +1275,32 @@ bool hStep(int tempFigure, int tempFinalPoint, Figure** map, int size, int tempF
 
 bool checkAbilityStep(int stepFromX, int stepFromY, Figure** map, bool botMode)
 {
-	if(!botMode)
+	if (!botMode)
 	{
+		if (!map[stepFromX][stepFromY].getNull())
+		{
+			std::cout << "SO BULL" << std::endl;
+			Sleep(2000);
+			return false;
+		}
 		if ((map[stepFromX][stepFromY].getColor() == 'B' && !player.getColorCurrentStep()) || (map[stepFromX][stepFromY].getColor() == 'W' && player.getColorCurrentStep()))
 		{
-			player.changeColorStep();
 			return true;
 		}
 		else
 		{
-			std::cout << "Not your turn" << std::endl;
+			std::cout << "So Bad Move" << std::endl;
 			Sleep(2000);
 			return false;
 		}
 	}
 	else
 	{
+		if (!map[stepFromX][stepFromY].getNull())
+		{
+			std::cout << "SO BULL" << std::endl;
+			return false;
+		}
 		if ((map[stepFromX][stepFromY].getColor() == 'B' && !player.getColorCurrentStep()) || (map[stepFromX][stepFromY].getColor() == 'W' && player.getColorCurrentStep()))
 			return true;
 		else
@@ -1133,32 +1363,49 @@ void botTurn(Figure** map, int size)
 	int fromY = 0;
 	int toX = 0;
 	int toY = 0;
-	bool close = false;
 	do {
 		fromX = rand() % 8 + 1;
 		fromY = rand() % 8 + 1;
-		for (int i = 0; i < 64; ++i)
+		toX = rand() % 8 + 1;
+		toY = rand() % 8 + 1;
+		if (newStep(map, size, fromY, fromX, toY, toX, true))
 		{
-			toX = rand() % 8 + 1;
-			toY = rand() % 8 + 1;
-			if (newStep(map, size, fromY, fromX, toY, toX, true))
-			{
-				std::cout << "SO NIIIIICE" << std::endl;
-				player.changeColorStep();
-				Sleep(1000);
-				close = true;
-				break;
-			}
-		}
-		if (close)
 			break;
-
+		}
 
 	} while (true);
 }
 
+std::string searchKing(Figure** map, int size)
+{
+	bool endGameCheckBlack = true;
+	bool endGameCheckWhite = true;
+	for (int i = 0; i < size; ++i)
+	{
+		for (int j = 0; j < size; ++j)
+		{
+			if (map[i][j].getValue() == u8"♚")
+			{
+				endGameCheckWhite = false;
+			}
+
+			if (map[i][j].getValue() == u8"♔")
+			{
+				endGameCheckBlack = false;
+			}
+		}
+	}
+	if (endGameCheckBlack)
+		return "WhiteLose";
+	if (endGameCheckWhite)
+		return "BlackLose";
+	if (!endGameCheckBlack && !endGameCheckWhite)
+		return "ALL";
+}
+
 int main()
 {
+	bool endGameCheck = false;
 	SetConsoleOutputCP(CP_UTF8);
 	SetConsoleCP(CP_UTF8);
 	const int size = 8;
@@ -1166,13 +1413,47 @@ int main()
 	firstFillingMap(map, size);
 	do
 	{
-		if (map[0][3].getValue() == u8"♔" || map[7][3].getValue() == u8"♚")
-			printMap(map, size);
+		endGameCheck = false;
+		printMap(map, size);
+
+		if (map[0][3].blackKingUnshakableCheck() && map[7][3].whiteKingUnshakableCheck())
+		{
+			if (map[0][3].getValue() != u8"♔")
+			{
+				std::cout << "White Player WIN!!!!" << std::endl;
+				Sleep(2000);
+				return 0;
+			}
+
+			if (map[7][3].getValue() != u8"♚")
+			{
+				std::cout << "Black Player WIN!!!!" << std::endl;
+				Sleep(2000);
+				return 0; 
+			}
+		} 
+		else
+		{
+			if (searchKing(map, size) == "BlackLose")
+			{
+				std::cout << "Black Player WIN!!!!" << std::endl;
+				Sleep(2000);
+				return 0;
+			}
+			if (searchKing(map, size) == "WhiteLose")
+			{
+				std::cout << "White Player WIN!!!!" << std::endl;
+				Sleep(2000);
+				return 0;
+			}
+		}
 		if (!player.getPlayerTurn())
 			botTurn(map, size);
 		else
 			stepFigure(map, size);
 		system("cls");
+
+
 	} while (true);
 }
 
@@ -1181,48 +1462,58 @@ bool newStep(Figure** map, int size, int tempFigure, int tempFigure2, int tempFi
 {
 	char closeFunc = false;
 	bool checkEnemy = false;
-
 	(map[size - (tempFigure2)][tempFigure - 1].getColor() == map[size - (tempFinalPoint2)][tempFinalPoint - 1].getColor()) ? checkEnemy = false : checkEnemy = true;
-	if(botMode)
-		(checkAbilityStep(size - (tempFigure2), tempFigure - 1, map, botMode)) ? closeFunc = true : closeFunc = false;
-	else
-		(checkAbilityStep(size - (tempFigure2), tempFigure - 1, map, botMode)) ? closeFunc = true : closeFunc = false;
-	if (closeFunc)
+	if (map[size - (tempFigure2)][tempFigure - 1].getNull() && (!map[size - (tempFinalPoint2)][tempFinalPoint - 1].getNull() || checkEnemy))
 	{
-		if (map[size - (tempFigure2)][tempFigure - 1].getNull() && ((!map[size - (tempFinalPoint2)][tempFinalPoint - 1].getNull() || checkEnemy)))
+		(checkAbilityStep(size - (tempFigure2), tempFigure - 1, map, botMode)) ? closeFunc = true : closeFunc = false;
+
+		if (closeFunc)
 		{
-			if (map[size - (tempFigure2)][tempFigure - 1].getValue() == u8"♘" || map[size - (tempFigure2)][tempFigure - 1].getValue() == u8"♞")
+			if (map[size - (tempFigure2)][tempFigure - 1].getNull() && ((!map[size - (tempFinalPoint2)][tempFinalPoint - 1].getNull() || checkEnemy)))
 			{
-				return (hStep(tempFigure, tempFinalPoint, map, size, tempFigure2, tempFinalPoint2, !botMode)) ? true: false;
+				if (map[size - (tempFigure2)][tempFigure - 1].getValue() == u8"♘" || map[size - (tempFigure2)][tempFigure - 1].getValue() == u8"♞")
+				{
+					return (hStep(tempFigure, tempFinalPoint, map, size, tempFigure2, tempFinalPoint2, !botMode)) ? true : false;
+				}
+				else if (map[size - (tempFigure2)][tempFigure - 1].getValue() == u8"♘" || map[size - (tempFigure2)][tempFigure - 1].getValue() == u8"♚")
+				{
+					return (kStep(tempFigure, tempFinalPoint, map, size, tempFigure2, tempFinalPoint2, !botMode)) ? true : false;
+				}
+				else if (map[size - (tempFigure2)][tempFigure - 1].getValue() == u8"♙" || map[size - (tempFigure2)][tempFigure - 1].getValue() == u8"♟")
+				{
+					return (pStep(tempFigure, tempFinalPoint, map, size, tempFigure2, tempFinalPoint2, !botMode)) ? true : false;
+				}
+				if (map[size - (tempFigure2)][tempFigure - 1].getValue() == u8"♖" || map[size - (tempFigure2)][tempFigure - 1].getValue() == u8"♜")
+				{
+					return (rStep(tempFigure, tempFinalPoint, map, size, tempFigure2, tempFinalPoint2, !botMode)) ? true : false;
+				}
+				else if ((map[size - (tempFigure2)][tempFigure - 1].getValue() == u8"♗") || (map[size - (tempFigure2)][tempFigure - 1].getValue() == u8"♝"))
+				{
+					return (eStep(tempFigure, tempFinalPoint, map, size, tempFigure2, tempFinalPoint2, !botMode)) ? true : false;
+				}
+				if (map[size - (tempFigure2)][tempFigure - 1].getValue() == u8"♕" || (map[size - (tempFigure2)][tempFigure - 1].getValue() == u8"♛"))
+				{
+					return (quennStep(tempFigure, tempFinalPoint, map, size, tempFigure2, tempFinalPoint2, !botMode)) ? true : false; 
+				}
 			}
-			else if (map[size - (tempFigure2)][tempFigure - 1].getValue() == u8"♔" || map[size - (tempFigure2)][tempFigure - 1].getValue() == u8"♛")
+			else
 			{
-				return (kStep(tempFigure, tempFinalPoint, map, size, tempFigure2, tempFinalPoint2, !botMode))? true : false;
-			}
-			else if (map[size - (tempFigure2)][tempFigure - 1].getValue() == u8"♙" || map[size - (tempFigure2)][tempFigure - 1].getValue() == u8"♟")
-			{
-				return (pStep(tempFigure, tempFinalPoint, map, size, tempFigure2, tempFinalPoint2, !botMode)) ? true : false;
-			}
-			if (map[size - (tempFigure2)][tempFigure - 1].getValue() == u8"♖" || map[size - (tempFigure2)][tempFigure - 1].getValue() == u8"♜")
-			{
-				return (rStep(tempFigure, tempFinalPoint, map, size, tempFigure2, tempFinalPoint2, !botMode)) ? true : false;
-			}
-			else if ((map[size - (tempFigure2)][tempFigure - 1].getValue() == u8"♗") || (map[size - (tempFigure2)][tempFigure - 1].getValue() == u8"♝"))
-			{
-				return (eStep(tempFigure, tempFinalPoint, map, size, tempFigure2, tempFinalPoint2, !botMode)) ? true : false;
-			}
-			if (map[size - (tempFigure2)][tempFigure - 1].getValue() == u8"♕")
-			{
-				return (quennStep(tempFigure, tempFinalPoint, map, size, tempFigure2, tempFinalPoint2, !botMode)) ? true : false;
+				if (!botMode)
+				{
+					std::cout << "Impossible point(" << std::endl;
+					Sleep(2000);
+				}
+				return false;
 			}
 		}
-		else
+	}
+	else
+	{
+		if(!botMode)
 		{
-			if(!botMode)
-			{
-				std::cout << "Impossible point(" << std::endl;
-				Sleep(2000);
-			}
+			std::cout << "NULL figure, try again" << std::endl;
+			Sleep(2000);
 		}
+			return false;
 	}
 }
