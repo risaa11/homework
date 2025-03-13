@@ -1526,7 +1526,7 @@ void stepFigure(Figure** map, int size)
 
 void botTurn(Figure** map, int size)
 {
-
+	Sleep(200);
 	int fromX = 0;
 	int fromY = 0;
 	int toX = 0;
@@ -1677,7 +1677,6 @@ int main()
 		else
 			stepFigure(map, size);
 		
-		Sleep(500);
 
 		system("cls");
 
