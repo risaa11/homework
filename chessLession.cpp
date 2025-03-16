@@ -35,6 +35,7 @@ class Pawn : public Rook
 {
 protected:
 	bool P = false;
+	bool firstStep = false;
 public:
 	Pawn(bool P)
 	{
@@ -43,6 +44,15 @@ public:
 	Pawn()
 	{
 		this->P = false;
+	}
+	void setTrueFirstStep()
+	{
+		this->firstStep = true;
+	}
+
+	bool getFirstStep()
+	{
+		return this->firstStep;
 	}
 };
 class Elephant : public Pawn
@@ -170,7 +180,7 @@ public:
 			else if (K) 
 				return u8"♔"; 
 			else if (!E && !Q && !H && !R && !P && !K)
-				return 0;
+				return " ";
 		}
 		else
 		{
@@ -187,7 +197,7 @@ public:
 			else if (K)
 				return u8"♚";
 			else if (!E && !Q && !H && !R && !P && !K)
-				return 0;
+				return " ";
 		}
 	}
 
@@ -309,7 +319,7 @@ class Player
 private:
 	bool colorCurrentStep = true;
 	bool playerTurn = true;
-	bool whiteMat = false;
+	bool whiteMath = false;
 	bool blackMath = false;
 	bool mate = false;
 public:
@@ -347,6 +357,36 @@ public:
 	bool getMate()
 	{
 		return this->mate;
+	}
+	
+	void setTrueBlackMate()
+	{
+		this->blackMath = true;
+	}
+
+	void setFalseBlackMate()
+	{
+		this->blackMath = false;
+	}
+
+	bool getBlackMate()
+	{
+		return this->blackMath;
+	}
+
+	void setTrueWhiteMate()
+	{
+		this->whiteMath = true;
+	}
+
+	void setFalseWhiteMate()
+	{
+		this->whiteMath = false;
+	}
+
+	bool getWhiteMate()
+	{
+		return this->whiteMath;
 	}
 
 };
@@ -392,6 +432,8 @@ void firstFillingMap(Figure** array, int size)
 	{
 		array[1][i].setValue('p', 'B');
 		array[6][i].setValue('p', 'W');
+		array[1][i].setTrueFirstStep();
+		array[6][i].setTrueFirstStep();
 	}
 	array[0][0].setValue('r', 'B');
 	array[0][7].setValue('r', 'B');
@@ -405,10 +447,10 @@ void firstFillingMap(Figure** array, int size)
 	array[0][5].setValue('e', 'B');
 	array[7][2].setValue('e', 'W');
 	array[7][5].setValue('e', 'W');
-	array[0][3].setValue('k', 'B');
-	array[7][3].setValue('k', 'W');
-	array[0][4].setValue('q', 'B');
-	array[7][4].setValue('q', 'W');
+	array[0][4].setValue('k', 'B');
+	array[7][4].setValue('k', 'W');
+	array[0][3].setValue('q', 'B');
+	array[7][3].setValue('q', 'W');
 }
 
 bool newStep(Figure** map, int size, int tempFigure, int tempFigure2, int tempFinalPoint, int tempFinalPoint2, bool botMode, bool matCheck);
@@ -845,7 +887,7 @@ bool pStep(int tempFigure, int tempFinalPoint, Figure** map, int size, int tempF
 	{
 		if (!map[size - (tempFinalPoint2)][tempFinalPoint - 1].getNull())
 		{
-			if ((tempFigure2 - tempFinalPoint2 == 1 || tempFigure2 - tempFinalPoint2 == -1) && (tempFigure - tempFinalPoint == 0))
+			if (((tempFigure2 - tempFinalPoint2 == 1 || tempFigure2 - tempFinalPoint2 == -1) && (tempFigure - tempFinalPoint == 0)) || ((tempFigure2 - tempFinalPoint2 == 2 || tempFigure2 - tempFinalPoint2 == -2) && map[size - (tempFigure2)][tempFigure - 1].getFirstStep()))
 			{
 				if (size - (tempFinalPoint2) < size - (tempFigure2))
 				{
@@ -906,7 +948,7 @@ bool pStep(int tempFigure, int tempFinalPoint, Figure** map, int size, int tempF
 	{
 		if (!map[size - (tempFinalPoint2)][tempFinalPoint - 1].getNull())
 		{
-			if ((tempFigure2 - tempFinalPoint2 == 1 || tempFigure2 - tempFinalPoint2 == -1) && (tempFigure - tempFinalPoint == 0))
+			if (((tempFigure2 - tempFinalPoint2 == 1 || tempFigure2 - tempFinalPoint2 == -1) && (tempFigure - tempFinalPoint == 0)) || ((tempFigure2 - tempFinalPoint2 == 2 || tempFigure2 - tempFinalPoint2 == -2) && map[size - (tempFigure2)][tempFigure - 1].getFirstStep()))
 			{
 				if (size - (tempFinalPoint2) > size - (tempFigure2))
 				{
@@ -1616,8 +1658,9 @@ bool checkKingAlive(Figure** map, int size)
 	return true;
 }
 
-bool matCheck(Figure** map, int size)
+bool matCheck(Figure** map, int size, bool botMode)
 {
+	bool stopSearch = false;
 	int kingX = 0;
 	int kingY = 0;
 	for (int toX = 0; toX < size; ++toX)
@@ -1628,10 +1671,12 @@ bool matCheck(Figure** map, int size)
 			{
 				kingX = toX;
 				kingY = toY;
-				std::cout << "KING - " << size - kingX << kingY + 1 << std::endl; 
-				Sleep(0);
+				stopSearch = true;
+				break;
 			}
 		}
+		if (stopSearch)
+			break;
 	}
 
 	for (int i = 0;i < size; ++i)
@@ -1646,8 +1691,22 @@ bool matCheck(Figure** map, int size)
 				{
 					player.changePlayerTurn();
 					player.changeColorStep();
-					(kingX == 0) ? std::cout << "\nBlack king has a check!!!\n" << std::endl : std::cout << "\nWhite king has a check!!!\n" << std::endl; 
-					Sleep(2000);
+					if (kingX == 0)
+					{
+						if(!botMode)
+							std::cout << "\nBlack king has a check!!!\n" << std::endl;
+						player.setTrueBlackMate();
+						player.setFalseWhiteMate();
+					}
+					else
+					{
+						if(!botMode)
+							std::cout << "\nWhite king has a check!!!\n" << std::endl;
+						player.setTrueWhiteMate();
+						player.setFalseBlackMate();
+					}
+					if(!botMode)
+						Sleep(2000);
 					player.setTrueMate();
 					return true;
 				}
@@ -1659,48 +1718,79 @@ bool matCheck(Figure** map, int size)
 			}
 		}
 	}
+	player.setFalseBlackMate();
+	player.setFalseWhiteMate();
 	player.setFalseMate();
 	return false;
 }
 
-void botMateTurn(Figure** map, int size)
+bool botMateTurn(Figure** map, int size)
 {
-	std::cout << "HELLO WORLD" << std::endl;
-	Sleep(2000);
 	int tempX = 0;
 	int tempY = 0;
 	bool close = false;
-	do
+	for(int tempX = 0; tempX < size; ++tempX)
 	{
-		if (map[tempX][tempY].getNull() && (map[tempX][tempY].getColor() == 'W' && player.getColorCurrentStep()) || (map[tempX][tempY].getColor() == 'W' && player.getColorCurrentStep()))
+		for (int tempY = 0; tempY < size; ++tempY)
 		{
-			for (int i = 0; i < size; ++i)
+ 			if (map[tempX][tempY].getNull() && (map[tempX][tempY].getColor() == 'W' && player.getColorCurrentStep()) || (map[tempX][tempY].getColor() == 'B' && !player.getColorCurrentStep()))
 			{
-				for (int j = 0; j < size; ++j)
+				for (int i = 0; i < size; ++i)
 				{
-					close = false;
-					if (newStep(map, size, tempY + 1, size - tempX, j + 1, size - i, true, true))
+					for (int j = 0; j < size; ++j)
 					{
-						matCheck(map, size);
-						if (player.getMate())
+						close = false;
+						if (map[i][j].getNull())
 						{
-							map
+							char tempVal = map[i][j].getCharValue();
+							if (newStep(map, size, tempY + 1, size - tempX, j + 1, size - i, true, false))
+							{
+								player.changeColorStep();
+								player.changePlayerTurn();
+								matCheck(map, size, true);
+								if (player.getMate())
+								{
+									map[tempX][tempY].setValue(map[i][j].getCharValue(), map[i][j].getColor());
+									map[i][j].setValue(tempVal, (map[tempX][tempY].getColor() == 'W') ? 'B' : 'W');
+								}
+								else
+								{
+									close = true;
+									return true;
+								}
+							}
 						}
 						else
 						{
-							close = true;
-							break;
+							if (newStep(map, size, tempY + 1, size - tempX, j + 1, size - i, true, false))
+							{
+								player.changeColorStep();
+								player.changePlayerTurn();
+								matCheck(map, size, true);
+								if (player.getMate())
+								{
+									map[tempX][tempY].setValue(map[i][j].getCharValue(), map[i][j].getColor());
+									map[i][j].setValue('n', (map[tempX][tempY].getColor() == 'W') ? 'W' : 'B');
+								}
+								else
+								{
+									close = true;
+									return true;
+								}
+							}
 						}
 					}
 				}
-				if (close)
-					break;
 			}
 		}
-
-		++tempX;
-		++tempY;
-	} while (!close);
+	}
+	system("cls");
+	printMap(map, size);
+	(player.getBlackMate()) ? std::cout << "Black king has a CheckMate" << std::endl : std::cout << "White king has a CheckMate" << std::endl;
+	Sleep(5000);
+	player.changeColorStep();
+	player.changePlayerTurn();
+	return false;
 }
 
 int main()
@@ -1719,29 +1809,29 @@ int main()
 
 		printMap(map, size);
 
-		matCheck(map, size);
-
-		if (map[0][3].blackKingUnshakableCheck() && map[7][3].whiteKingUnshakableCheck())
-		{
-			if (!checkDefaultKingAlive(map))
-				return 0;
-		}
-		else
-			if (!checkKingAlive(map, size))
-				return 0;
-
+		matCheck(map, size, false);
 
 		if(!player.getMate())
 		{
-			if (!player.getPlayerTurn())
-				botTurn(map, size);
-			else
+			//if (!player.getPlayerTurn())
+			//	botTurn(map, size);
+			//else
 				stepFigure(map, size);
 		}
 		else
 		{
 			if (!player.getPlayerTurn())
-				botMateTurn(map, size);
+			{
+				if (!botMateTurn(map, size))
+				{
+					return 0;
+				}
+				else
+				{
+					player.changeColorStep();
+					player.changePlayerTurn();
+				}
+			}
 			else
 				stepFigure(map, size);
 		}
