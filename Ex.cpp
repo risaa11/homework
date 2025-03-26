@@ -1,5 +1,7 @@
 #include <iostream>
 
+using namespace std;
+
 class Conclusion
 {
 public:
@@ -41,6 +43,9 @@ public:
 	void print() override
 	{
 		std::cout << "This weight = " << this->weight << "\nThis material" << this->material << std::endl;
+	}
+	friend ostream& operator<<(ostream& torrent, Vehicle& d) {
+		torrent << "This weight = " << d.weight << "\nThis material" << d.material << std::endl;
 	}
 };
 
@@ -98,6 +103,11 @@ public:
 		Vehicle::print();
 		std::cout << "This horsepower = " << this->horsepower << "\nThis length" << this->length << "\nThis width" << this->width << std::endl;
 	}
+	friend ostream& operator<<(ostream& torrent, Car& d) {
+		torrent << "This weight = " << d.weight << "\nThis material" << d.material << std::endl;
+		torrent << "This horsepower = " << d.horsepower << "\nThis length" << d.length << "\nThis width" << d.width << std::endl;
+		return torrent;
+	}
 };
 
 class Train : public Vehicle
@@ -152,7 +162,12 @@ public:
 	void print() override
 	{
 		Vehicle::print();
-		std::cout << "\nThis numberOfWagons = " << this->numberOfWagons << "\nThis maxSpeed" << this->maxSpeed << "\nThis type" << this->type << std::endl;
+		std::cout << "This numberOfWagons = " << this->numberOfWagons << "\nThis maxSpeed" << this->maxSpeed << "\nThis type" << this->type << std::endl;
+	}
+	friend ostream& operator<<(ostream& torrent, Train& d) {
+		torrent << "This weight = " << d.weight << "\nThis material" << d.material << std::endl;
+		torrent << "This numberOfWagons = " << d.numberOfWagons << "\nThis maxSpeed" << d.maxSpeed << "\nThis type" << d.type << std::endl;\
+		return torrent;
 	}
 };
 
@@ -192,10 +207,16 @@ public:
 		Train::print();
 		std::cout<< "\nThis movementPlan = " << this->movementPlan << std::endl;
 	}
+	friend ostream& operator<<(ostream& torrent, Express& d) {
+		torrent << "This weight = " << d.weight << "\nThis material" << d.material << std::endl;
+		torrent << "This numberOfWagons = " << d.numberOfWagons << "\nThis maxSpeed" << d.maxSpeed << "\nThis type" << d.type << std::endl;
+		torrent << "This movementPlan = " << d.movementPlan << std::endl;
+		return torrent;
+	}
 };
 
 int main()
 {
 	Express expressTest(99, 33, "So small(((", 50, "Ironn", "Left, right, straight");
-	expressTest.print();
+	std::cout << expressTest;
 }
