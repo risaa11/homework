@@ -1,0 +1,151 @@
+#include <iostream>
+#include <string>
+#include <stdexcept>
+#include <vector>
+#include <algorithm>
+#include <cctype>
+
+using namespace std;
+
+class Encryptor {
+public:
+    virtual ~Encryptor() {}
+
+    virtual string Crypt(const string& message) = 0;
+    virtual string Salt(const string& password) = 0;
+
+    virtual void ValidateInput(const string& input) const {
+        if (input.empty()) {
+            throw invalid_argument("Пустая строка недопустима");
+        }
+    }
+};
+
+class AtbashEncryptor : public Encryptor {
+public:
+    string Crypt(const string& message) override {
+        ValidateInput(message);
+        string result;
+
+        for (char c : message) {
+            if (isalpha(c)) {
+                if (isupper(c)) {
+                    result += 'Z' - (c - 'A');
+                }
+                else {
+                    result += 'z' - (c - 'a');
+                }
+            }
+            else {
+                result += c;
+            }
+        }
+
+        return result;
+    }
+
+    string Salt(const string& password) override {
+        ValidateInput(password);
+        return password + "AtB";
+    }
+};
+
+class CaesarEncryptor : public Encryptor {
+    int shift;
+public:
+    CaesarEncryptor(int shift = 3) : shift(shift) {
+        if (shift <= 0 || shift > 25) {
+            throw invalid_argument("Сдвиг должен быть между 1 и 25");
+        }
+    }
+
+    string Crypt(const string& message) override {
+        ValidateInput(message);
+        string result;
+
+        for (char c : message) {
+            if (isalpha(c)) {
+                char base = isupper(c) ? 'A' : 'a';
+                result += ((c - base + shift) % 26) + base;
+            }
+            else {
+                result += c;
+            }
+        }
+
+        return result;
+    }
+
+    string Salt(const string& password) override {
+        ValidateInput(password);
+        return "CaS" + password + to_string(shift);
+    }
+};
+
+class CustomEncryptor : public Encryptor {
+    char key;
+public:
+    CustomEncryptor(char key = 'X') : key(key) {
+        if (!isprint(key)) {
+            throw invalid_argument("Ключ должен быть печатным символом");
+        }
+    }
+
+    string Crypt(const string& message) override {
+        ValidateInput(message);
+        string result = message;
+
+        for (char& c : result) {
+            c ^= key;
+        }
+
+        reverse(result.begin(), result.end());
+
+        return result;
+    }
+
+    string Salt(const string& password) override {
+        ValidateInput(password);
+        string salt(1, key);
+        return salt + password + salt;
+    }
+};
+
+void demoEncryption(Encryptor& encryptor) {
+    try {
+        string message = "Hello World!";
+        string password = "secret";
+
+        cout << "Original: " << message << endl;
+        string encrypted = encryptor.Crypt(message);
+        cout << "Encrypted: " << encrypted << endl;
+
+        string salted = encryptor.Salt(password);
+        cout << "Password: " << password << endl;
+        cout << "Salted: " << salted << endl << endl;
+    }
+    catch (const exception& e) {
+        cerr << "Ошибка: " << e.what() << endl;
+    }
+}
+
+int main() {
+    try {
+        vector<unique_ptr<Encryptor>> encryptors;
+
+        encryptors.push_back(make_unique<AtbashEncryptor>());
+        encryptors.push_back(make_unique<CaesarEncryptor>(5));
+        encryptors.push_back(make_unique<CustomEncryptor>('K'));
+
+        for (const auto& encryptor : encryptors) {
+            demoEncryption(*encryptor);
+        }
+
+        CaesarEncryptor badEncryptor(0);
+    }
+    catch (const exception& e) {
+        cerr << "Ошибка при создании шифратора: " << e.what() << endl;
+    }
+
+    return 0;
+}
