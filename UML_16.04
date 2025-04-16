@@ -1,0 +1,104 @@
+using System;
+using System.Threading;
+
+public enum SvetoforCvet
+{
+    Krasniy,
+    Jeltiy,
+    Zeleniy
+}
+
+public class Svetofor
+{
+    private SvetoforCvet tekushiyCvet;
+    private bool rabotaet = false;
+    
+    private const int KrasniyVremya = 5000;
+    private const int JeltiyVremya = 2000;
+    private const int ZeleniyVremya = 10000;
+    
+    public event Action<string> PriSmeniSostoyaniya;
+    
+    public Svetofor()
+    {
+        tekushiyCvet = SvetoforCvet.Krasniy;
+    }
+    
+    public void Nachat()
+    {
+        if (rabotaet) return;
+        
+        rabotaet = true;
+        Console.WriteLine("Svetofor nachal rabotu");
+        
+        Thread potokSvetofora = new Thread(RabotaSvetofora);
+        potokSvetofora.IsBackground = true;
+        potokSvetofora.Start();
+    }
+    
+    public void Ostanovit()
+    {
+        rabotaet = false;
+        Console.WriteLine("Svetofor ostanovlen");
+    }
+    
+    private void RabotaSvetofora()
+    {
+        while (rabotaet)
+        {
+            switch (tekushiyCvet)
+            {
+                case SvetoforCvet.Krasniy:
+                    Uvedomlenie("Krasniy svet! Stoyat!", "Krasniy svet! Ne idti!");
+                    Thread.Sleep(KrasniyVremya);
+                    SmenitCvet(SvetoforCvet.Zeleniy);
+                    break;
+                    
+                case SvetoforCvet.Jeltiy:
+                    Uvedomlenie("Jeltiy svet! Gotovitsya!", "Jeltiy svet! Zakanchivat perehod!");
+                    Thread.Sleep(JeltiyVremya);
+                    SmenitCvet(SvetoforCvet.Krasniy);
+                    break;
+                    
+                case SvetoforCvet.Zeleniy:
+                    Uvedomlenie("Zeleniy svet! Exat!", "Zeleniy svet! Idti!");
+                    Thread.Sleep(ZeleniyVremya);
+                    SmenitCvet(SvetoforCvet.Jeltiy);
+                    break;
+            }
+        }
+    }
+    
+    private void SmenitCvet(SvetoforCvet noviyCvet)
+    {
+        tekushiyCvet = noviyCvet;
+        Console.WriteLine($"Cvet svetofora izmenilsya na: {tekushiyCvet}");
+        PriSmeniSostoyaniya?.Invoke($"Sostoyanie: {tekushiyCvet}");
+    }
+    
+    private void Uvedomlenie(string soobshenieVoditelyam, string soobsheniePeshehodam)
+    {
+        Console.WriteLine($"Dlya voditeley: {soobshenieVoditelyam}");
+        Console.WriteLine($"Dlya peshehodov: {soobsheniePeshehodam}");
+    }
+}
+
+public class Program
+{
+    public static void Main()
+    {
+        Svetofor svetofor = new Svetofor();
+        
+        svetofor.PriSmeniSostoyaniya += (soobshenie) => 
+        {
+            Console.WriteLine($"Uvedomlenie: {soobshenie}");
+        };
+        
+        svetofor.Nachat();
+        
+        Console.WriteLine("Najmite lubuyu klavishu dlya ostanovki svetofora...");
+        Console.ReadKey();
+        
+        svetofor.Ostanovit();
+    }
+}
