@@ -1,0 +1,99 @@
+using System;
+
+namespace ShablonnyjMetodPattern
+{
+   
+    public abstract class ObrabotchikZakaza
+    {
+       
+        public void ObratotatZakaz()
+        {
+            ProveritNalichie();
+            PrimenitSkidku();
+            SozdatZakaz();
+            UvedomitKlienta();
+        }
+
+       
+        private void ProveritNalichie()
+        {
+            Console.WriteLine("Проверяем наличие товара на складе...");
+          
+            Console.WriteLine("Товар в наличии.");
+        }
+
+   
+        protected abstract void PrimenitSkidku();
+
+      
+        protected abstract void SozdatZakaz();
+
+        
+        private void UvedomitKlienta()
+        {
+            Console.WriteLine("Отправляем уведомление клиенту на email...");
+          
+            Console.WriteLine("Клиент уведомлен.");
+        }
+    }
+
+
+    public class ObrabotchikPromoZakaza : ObrabotchikZakaza
+    {
+        protected override void PrimenitSkidku()
+        {
+            Console.WriteLine("Применяем скидку по промокоду 15%...");
+        }
+
+        protected override void SozdatZakaz()
+        {
+            Console.WriteLine("Создаем заказ с промокодом...");
+        }
+    }
+
+   
+    public class ObrabotchikOptovogoZakaza : ObrabotchikZakaza
+    {
+        protected override void PrimenitSkidku()
+        {
+            Console.WriteLine("Применяем оптовую скидку 20%...");
+        }
+
+        protected override void SozdatZakaz()
+        {
+            Console.WriteLine("Создаем оптовый заказ со специальными условиями...");
+        }
+    }
+
+  
+    public class ObrabotchikObychnogoZakaza : ObrabotchikZakaza
+    {
+        protected override void PrimenitSkidku()
+        {
+            Console.WriteLine("Скидка не применяется.");
+        }
+
+        protected override void SozdatZakaz()
+        {
+            Console.WriteLine("Создаем обычный заказ...");
+        }
+    }
+
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            Console.WriteLine("Обработка заказа с промокодом:");
+            ObrabotchikZakaza obrabotchikPromo = new ObrabotchikPromoZakaza();
+            obrabotchikPromo.ObratotatZakaz();
+
+            Console.WriteLine("\nОбработка оптового заказа:");
+            ObrabotchikZakaza obrabotchikOpt = new ObrabotchikOptovogoZakaza();
+            obrabotchikOpt.ObratotatZakaz();
+
+            Console.WriteLine("\nОбработка обычного заказа:");
+            ObrabotchikZakaza obrabotchikObych = new ObrabotchikObychnogoZakaza();
+            obrabotchikObych.ObratotatZakaz();
+        }
+    }
+}
